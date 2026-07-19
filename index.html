@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wortwerk — Übersicht</title>
+<!-- No external requests. Nothing about your use of this app leaves the device.
+     To restore the original Barlow Condensed / IBM Plex typography, delete the
+     comment markers around the three lines below — same as in every Paket file. -->
+<!--
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+-->
+<style>
+:root{
+  --paper:#E7E8E3; --paper-2:#DDDFD8; --card:#F5F6F2;
+  --ink:#16181D; --ink-60:#5A5F68; --ink-40:#8A8F96;
+  --line:#C6C9C1;
+  --blau:#0A5FCE; --himmel:#29A3E0; --gruen:#1F9E63;
+  --violett:#6A4CE0; --gelb:#E8A200; --rot:#CE3B2B;
+  --disp:'Barlow Condensed','Avenir Next Condensed','Roboto Condensed','Arial Narrow','Segoe UI',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+  --r:3px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--body);
+  font-size:16px; line-height:1.5; overscroll-behavior-y:none;
+  background-image:linear-gradient(var(--paper-2) 1px,transparent 1px),linear-gradient(90deg,var(--paper-2) 1px,transparent 1px);
+  background-size:28px 28px; background-position:-1px -1px;
+}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px 60px}
+
+/* ---------- header ---------- */
+.top{position:relative;z-index:40;background:var(--ink);color:var(--paper);margin:0 0 0;padding:10px 14px 8px}
+.top-row{display:flex;align-items:center;gap:10px;max-width:732px;margin:0 auto}
+.mark{font-family:var(--disp);font-weight:700;font-size:26px;letter-spacing:.06em;text-transform:uppercase;line-height:1}
+.mark span{color:var(--gelb)}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:3px 7px;border:1px solid rgba(231,232,227,.35);border-radius:var(--r);white-space:nowrap}
+.chip.fire{border-color:var(--gelb);color:var(--gelb)}
+.spacer{flex:1}
+.xpbar{max-width:732px;margin:8px auto 0;height:5px;background:rgba(231,232,227,.18);border-radius:2px;overflow:hidden}
+.xpbar i{display:block;height:100%;background:var(--gelb);width:0;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.xplabel{max-width:732px;margin:4px auto 0;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:rgba(231,232,227,.6);text-transform:uppercase}
+
+/* ---------- generic blocks ---------- */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-40);margin:0 0 8px}
+h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:26px 0 4px;line-height:1}
+.muted{color:var(--ink-60);font-size:14px;margin:0 0 12px}
+.tiny{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink-40)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--ink);color:var(--paper);
+  font-family:var(--disp);text-transform:uppercase;letter-spacing:.07em;font-weight:600;font-size:15px;
+  padding:7px 13px;border-radius:var(--r)}
+
+/* ---------- streckenplan (signature — reused as the hub's hero) ---------- */
+.strecke{background:var(--ink);border-radius:var(--r);padding:16px 14px 12px;margin-bottom:6px;color:var(--paper);position:relative;overflow:hidden}
+.strecke .eyebrow{color:rgba(231,232,227,.5)}
+.rail{position:relative;height:96px;margin-top:6px}
+.rail-line{position:absolute;left:0;right:0;top:34px;height:6px;background:rgba(231,232,227,.16);border-radius:3px}
+.rail-done{position:absolute;left:0;top:34px;height:6px;background:var(--gelb);border-radius:3px;width:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.stn{position:absolute;top:0;transform:translateX(-50%);text-align:center;width:48px}
+.stn b{display:block;font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:.04em;line-height:1;height:20px}
+.stn .dot{width:15px;height:15px;border-radius:50%;background:var(--ink);border:3px solid rgba(231,232,227,.35);margin:9px auto 0;transition:.4s}
+.stn.on .dot{border-color:var(--gelb);background:var(--gelb)}
+.stn.here .dot{box-shadow:0 0 0 5px rgba(232,162,0,.25)}
+.stn s{display:block;text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;color:rgba(231,232,227,.5);margin-top:7px}
+.train{position:absolute;top:26px;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:var(--ink);background:var(--gelb);
+  padding:1px 5px;border-radius:2px;white-space:nowrap;font-weight:600;transition:left .8s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- pack picker ---------- */
+.packgrid{display:grid;grid-template-columns:1fr;gap:10px}
+.packcard{position:relative;display:flex;flex-direction:column;gap:9px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);padding:14px 15px;transition:transform .1s}
+.packcard.live{border-left:5px solid var(--gelb)}
+.packcard.live:active{transform:translateY(1px)}
+.packcard.locked{opacity:.5}
+.pk-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.pk-id{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-40)}
+.pk-name{font-family:var(--disp);font-size:23px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;line-height:1.05;margin:2px 0 0}
+.pk-bar{height:6px;background:var(--paper-2);border-radius:3px;overflow:hidden}
+.pk-bar i{display:block;height:100%;background:var(--blau)}
+.pk-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--ink-60)}
+.pk-cta{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;background:var(--ink);color:var(--paper)}
+.pk-cta.soon{background:transparent;color:var(--ink-40);border:1px dashed var(--line)}
+
+/* ---------- badges ---------- */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.badge{border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:10px 8px;text-align:center;opacity:.4}
+.badge.got{opacity:1;border-color:var(--gelb);background:#FDF4E0}
+.badge b{display:block;font-family:var(--disp);font-size:14px;text-transform:uppercase;letter-spacing:.03em;line-height:1.1}
+.badge s{display:block;text-decoration:none;font-size:10px;color:var(--ink-60);margin-top:3px;line-height:1.2}
+.badge em{font-style:normal;font-size:19px;display:block;margin-bottom:3px}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--ink);color:var(--paper);
+  padding:10px 16px;border-radius:var(--r);font-family:var(--disp);font-size:18px;letter-spacing:.05em;text-transform:uppercase;
+  z-index:80;opacity:0;pointer-events:none;transition:.25s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.storewarn{background:var(--rot);color:#fff;padding:11px 13px;border-radius:var(--r);margin:14px 0;font-size:13.5px;line-height:1.4}
+.storewarn b{font-family:var(--disp);font-size:18px;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:2px}
+.hide{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+:focus-visible{outline:3px solid var(--blau);outline-offset:2px}
+@media(max-width:560px){.packgrid{grid-template-columns:1fr}}
+@media(min-width:561px){.packgrid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="mark">Wort<span>werk</span></div>
+    <div class="spacer"></div>
+    <div class="chip" id="chLevel">Stufe 1</div>
+    <div class="chip" id="chRank"></div>
+    <div class="chip fire" id="chStreak">0 Tage</div>
+  </div>
+  <div class="xpbar"><i id="xpFill"></i></div>
+  <div class="xplabel"><span id="xpNow">0 XP</span><span id="xpNext">100 XP → Stufe 2</span></div>
+</header>
+
+<main class="wrap">
+
+<div class="storewarn hide" id="storeWarn"></div>
+
+<div id="resume" class="panel hide" style="border-left:5px solid var(--gelb);margin-top:14px">
+  <p class="eyebrow">Weiter geht's</p>
+  <div id="resumeTxt" style="font-size:15px"></div>
+</div>
+
+<section>
+  <p class="eyebrow" id="motto" style="margin-top:18px"></p>
+  <h2 class="sec" style="margin-top:0">Route nach C2</h2>
+  <p class="muted">Jedes Paket schreibt in dasselbe Konto — ein Level, eine Serie, eine Strecke.</p>
+  <div class="strecke">
+    <p class="eyebrow">Wörter gelernt, über alle Pakete</p>
+    <div class="rail" id="rail"></div>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec">Wähle ein Paket</h2>
+  <p class="muted">Jedes Paket ist eine eigene Seite — dein Fortschritt bleibt trotzdem eine gemeinsame Geschichte.</p>
+  <div class="packgrid" id="packGrid"></div>
+</section>
+
+<section>
+  <h2 class="sec">Abzeichen</h2>
+  <p class="muted">Gesammelt über alle Pakete hinweg.</p>
+  <div class="badges" id="badgeGrid"></div>
+</section>
+
+<p class="tiny" style="text-align:center;margin-top:30px">Speichert in <span id="storeMode">…</span> · keine externen Anfragen · keine Werbung, nie</p>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   WORTWERK — hub
+   Reads the same shared profile every Paket writes to. Never
+   writes anything itself: this page only routes and displays.
+   ============================================================ */
+const K_PROFILE = 'wortwerk:profile';
+const K_PACKS   = 'wortwerk:packs';
+
+const mem = {};
+let STORE_MODE = 'memory';
+const STORE = {
+  async get(k) {
+    try {
+      if (window.storage) { STORE_MODE = 'account'; const r = await window.storage.get(k); if (r) return JSON.parse(r.value); }
+    } catch (e) { }
+    try { const v = localStorage.getItem(k); if (v != null) { if (STORE_MODE !== 'account') STORE_MODE = 'device'; return JSON.parse(v); } } catch (e) { }
+    return mem[k] !== undefined ? mem[k] : null;
+  }
+};
+
+/* The plan, in order. `built:true` means the file exists today;
+   the rest light up on their own the moment they've been opened
+   once — this list never needs editing to "notice" a new Paket. */
+const ROUTE = [
+  { id: 'p1', file: 'paket1.html', name: 'Paket 1 · Kernwortschatz', total: 1153, order: 1, built: true },
+  { id: 'p2', file: 'paket2.html', name: 'Paket 2', total: 1000, order: 2, built: false },
+  { id: 'p3', file: 'paket3.html', name: 'Paket 3', total: 1000, order: 3, built: false },
+  { id: 'p4', file: 'paket4.html', name: 'Paket 4', total: 1000, order: 4, built: false },
+  { id: 'p5', file: 'paket5.html', name: 'Paket 5', total: 1000, order: 5, built: false }
+];
+
+const STATIONS = [['A1', 500], ['A2', 1200], ['B1', 2700], ['B2', 5500], ['C1', 10500], ['C2', 21000]];
+
+const RANKS = [
+  ['Wortsammler', 'word gatherer'], ['Silbenschmied', 'syllable smith'],
+  ['Artikelringer', 'article wrestler'], ['Kasusjongleur', 'case juggler'],
+  ['Satzbaumeister', 'sentence architect'], ['Konjunktivkünstler', 'subjunctive artist'],
+  ['Nebensatznavigator', 'subclause navigator'], ['Partikelflüsterer', 'particle whisperer'],
+  ['Kompositumschmied', 'compound-word smith'], ['Wortwerkmeister', 'master of the word-works'],
+  ['Sprachgewalt', 'force of language']
+];
+
+const BADGE_META = {
+  start: { icon: '⚑', name: 'Anfang', desc: 'Finish one session' },
+  c100: { icon: '✦', name: 'Hundert', desc: '100 correct answers' },
+  c500: { icon: '▲', name: 'Fünfhundert', desc: '500 correct answers' },
+  c2000: { icon: '☰', name: 'Zweitausend', desc: '2 000 correct answers' },
+  s7: { icon: '☼', name: 'Sieben', desc: '7-day streak' },
+  s30: { icon: '⟲', name: 'Dreißig', desc: '30-day streak' },
+  k15: { icon: '⚡', name: 'Kombo', desc: '15 right in a row' },
+  w100: { icon: '◆', name: 'Hundert Wörter', desc: '100 words learned' },
+  w500: { icon: '◈', name: 'A2-Schwelle', desc: '500 words learned' }
+};
+function badgeMeta(id) {
+  if (BADGE_META[id]) return BADGE_META[id];
+  const m = id.match(/^pack(\d+)$/);
+  if (m) return { icon: '★', name: 'Paket ' + m[1], desc: 'Every word in Paket ' + m[1] + ' mastered' };
+  return { icon: '●', name: id, desc: '' };
+}
+
+const MOTTOS = [
+  'Der Weg ist das Wort.', 'Kleine Schritte, große Wirkung.', 'Übung schmiedet Meister.',
+  'Ein Wort heute ist zehn morgen wert.', 'Der Zug fährt weiter.', 'Fleiß ist die beste Grammatik.',
+  'Wortschatz wächst leise.', 'Jeder Tag ein Ziegelstein.'
+];
+
+const DAY = 86400000;
+const today = () => Math.floor(Date.now() / DAY);
+const esc = s => (s + '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function levelOf(xp) { let L = 1, need = 100, acc = 0; while (xp >= acc + need) { acc += need; L++; need = 100 + (L - 1) * 60; } return { L, into: xp - acc, need }; }
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 1800); }
+
+function paintHeader(S) {
+  const lv = levelOf(S.xp || 0);
+  document.getElementById('chLevel').textContent = 'Stufe ' + lv.L;
+  const rk = RANKS[Math.min(RANKS.length - 1, lv.L - 1)];
+  const rkEl = document.getElementById('chRank'); rkEl.textContent = rk[0]; rkEl.title = rk[1];
+  document.getElementById('chStreak').textContent = (S.streak || 0) + ((S.streak || 0) === 1 ? ' Tag' : ' Tage');
+  document.getElementById('xpFill').style.width = (100 * lv.into / lv.need) + '%';
+  document.getElementById('xpNow').textContent = (S.xp || 0) + ' XP';
+  document.getElementById('xpNext').textContent = (lv.need - lv.into) + ' XP → Stufe ' + (lv.L + 1);
+}
+
+function paintRail(learnedTotal) {
+  const total = STATIONS[STATIONS.length - 1][1];
+  const pos = v => Math.max(6, Math.min(93, 6 + 87 * Math.pow(Math.min(1, v / total), 0.55)));
+  const done = pos(learnedTotal);
+  document.getElementById('rail').innerHTML =
+    '<div class="rail-line"></div><div class="rail-done" style="width:' + done + '%"></div>' +
+    STATIONS.map(([n, v]) => {
+      const p = pos(v), on = learnedTotal >= v;
+      const here = !on && (STATIONS.filter(s => learnedTotal < s[1])[0] || STATIONS[5])[0] === n;
+      return '<div class="stn ' + (on ? 'on' : '') + ' ' + (here ? 'here' : '') + '" style="left:' + p + '%"><b>' + n + '</b><div class="dot"></div><s>' + v.toLocaleString() + '</s></div>';
+    }).join('') +
+    '<div class="train" style="left:' + done + '%">▲ ' + learnedTotal + '</div>';
+}
+
+function paintPacks(packs) {
+  // Merge the known roadmap with whatever the browser has actually recorded —
+  // any pack that has ever been opened is "built", roadmap or not.
+  const known = new Set(ROUTE.map(r => r.id));
+  const extra = Object.keys(packs).filter(id => !known.has(id)).map(id => ({
+    id, file: 'paket' + id.replace(/\D/g, '') + '.html',
+    name: packs[id].name || id, total: packs[id].total || 0,
+    order: 90 + Object.keys(packs).indexOf(id), built: true
+  }));
+  const list = [...ROUTE, ...extra].sort((a, b) => a.order - b.order);
+
+  document.getElementById('packGrid').innerHTML = list.map(r => {
+    const p = packs[r.id];
+    const built = r.built || !!p;
+    const name = (p && p.name) || r.name;
+    const total = (p && p.total) || r.total;
+    const learned = p ? p.learned || 0 : 0;
+    const mastered = p ? p.mastered || 0 : 0;
+    const pct = total ? Math.min(100, Math.round(100 * learned / total)) : 0;
+
+    if (!built) {
+      return '<div class="packcard locked"><div class="pk-top"><span class="pk-id">Paket ' + r.order + '</span><span class="pk-cta soon">bald</span></div>' +
+        '<p class="pk-name">' + esc(name) + '</p>' +
+        '<p class="tiny" style="margin:0">~' + total.toLocaleString() + ' Wörter · noch nicht gebaut</p></div>';
+    }
+    const metaRight = p && p.at != null
+      ? (today() - p.at === 0 ? 'heute geöffnet' : 'vor ' + (today() - p.at) + ' Tagen')
+      : 'noch nicht begonnen';
+    return '<a class="packcard live" href="' + r.file + '"><div class="pk-top"><span class="pk-id">Paket ' + r.order + '</span>' +
+      '<span class="pk-cta">' + (learned > 0 ? 'weiter' : 'start') + '</span></div>' +
+      '<p class="pk-name">' + esc(name) + '</p>' +
+      '<div class="pk-bar"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="pk-meta"><span>' + learned + ' / ' + total + ' gelernt · ' + mastered + ' mastered</span><span>' + metaRight + '</span></div></a>';
+  }).join('');
+}
+
+function paintBadges(earned) {
+  const got = new Set(earned || []);
+  const ids = Array.from(new Set([...Object.keys(BADGE_META), ...ROUTE.map(r => 'pack' + r.id.replace(/\D/g, '')), ...got]));
+  document.getElementById('badgeGrid').innerHTML = ids.map(id => {
+    const m = badgeMeta(id), on = got.has(id);
+    return '<div class="badge ' + (on ? 'got' : '') + '"><em>' + m.icon + '</em><b>' + esc(m.name) + '</b><s>' + esc(m.desc) + '</s></div>';
+  }).join('');
+}
+
+function paintResume(packs) {
+  const ids = Object.keys(packs).filter(id => packs[id] && packs[id].at != null);
+  if (!ids.length) return;
+  ids.sort((a, b) => (packs[b].at || 0) - (packs[a].at || 0));
+  const top = ids[0], p = packs[top];
+  const route = ROUTE.find(r => r.id === top);
+  const file = route ? route.file : 'paket' + top.replace(/\D/g, '') + '.html';
+  const ago = today() - p.at === 0 ? 'heute' : today() - p.at === 1 ? 'gestern' : 'vor ' + (today() - p.at) + ' Tagen';
+  const el = document.getElementById('resume');
+  el.classList.remove('hide');
+  document.getElementById('resumeTxt').innerHTML =
+    'Zuletzt ' + ago + ' in <b>' + esc(p.name || top) + '</b> — ' + (p.learned || 0) + ' von ' + (p.total || '?') + ' Wörtern gelernt.' +
+    '<br><a class="btn" style="margin-top:9px" href="' + file + '">Weiter →</a>';
+}
+
+async function boot() {
+  const profile = await STORE.get(K_PROFILE) || {};
+  const packs = await STORE.get(K_PACKS) || {};
+
+  document.getElementById('motto').textContent = MOTTOS[today() % MOTTOS.length];
+
+  paintHeader(profile);
+  paintResume(packs);
+
+  const learnedTotal = Object.values(packs).reduce((n, p) => n + (p.learned || 0), 0);
+  paintRail(learnedTotal);
+  paintPacks(packs);
+  paintBadges(profile.badges);
+
+  const modeTxt = { account: 'deinem Claude-Konto (folgt dir über Geräte hinweg)', device: 'diesem Browser', memory: 'nur diesem Tab — nichts bleibt erhalten' };
+  document.getElementById('storeMode').textContent = modeTxt[STORE_MODE] || modeTxt.device;
+  const warn = document.getElementById('storeWarn');
+  if (STORE_MODE === 'memory') {
+    warn.classList.remove('hide');
+    warn.innerHTML = '<b>Fortschritt wird nicht gespeichert.</b> Dieser Browser blockiert Speicherung — oft privates Surfen oder ein eingebetteter Frame. Öffne die Seite unter ihrer eigenen Adresse.';
+  }
+  if (!Object.keys(packs).length) toast('Willkommen bei Wortwerk');
+}
+boot();
+</script>
+</body>
+</html>
