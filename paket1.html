@@ -159,6 +159,7 @@ input.answer:focus{outline:none;border-color:var(--blau);box-shadow:0 0 0 3px rg
 button.shaky{display:block;width:100%;margin-top:10px;padding:9px;border:1px dashed var(--violett);border-radius:var(--r);
   color:var(--violett);font-family:var(--disp);font-size:16px;letter-spacing:.05em;text-transform:uppercase;background:rgba(106,76,224,.05)}
 button.shaky:active{background:rgba(106,76,224,.14)}
+#shakySlot:not(:empty){margin-bottom:12px}
 .wotd{background:var(--violett);color:#fff;border-radius:var(--r);padding:14px;margin-bottom:14px;cursor:pointer;position:relative;overflow:hidden}
 .wotd .eyebrow{color:rgba(255,255,255,.6)}
 .wotd h4{font-family:var(--disp);font-size:clamp(24px,7vw,38px);font-weight:700;margin:0;line-height:1;letter-spacing:.01em;word-break:break-word}
@@ -253,6 +254,12 @@ details.acc .in{padding:0 13px 13px}
 .eq i:nth-child(2){animation-delay:.19s}
 .eq i:nth-child(3){animation-delay:.38s}
 @keyframes eqb{0%,100%{height:3px}50%{height:12px}}
+.wv{position:relative;display:block;width:13px;height:12px}
+.wv i{position:absolute;top:50%;left:0;border:1.5px solid transparent;border-right-color:currentColor;
+  border-radius:50%;transform:translateY(-50%)}
+.wv i:nth-child(1){width:4px;height:4px}
+.wv i:nth-child(2){width:8px;height:8px}
+.wv i:nth-child(3){width:12px;height:12px}
 
 /* ---------- a header that cannot overflow ---------- */
 body{overflow-x:clip}
@@ -372,6 +379,7 @@ body{overflow-x:clip}
         </div>
       </div>
     </div>
+    <div id="shakySlot"></div>
     <div class="row">
       <button class="btn ghost" id="btnHint">Show me</button>
       <button class="btn ghost" id="btnQuit">End session</button>
@@ -480,7 +488,7 @@ body{overflow-x:clip}
 <div class="toast" id="toast"></div>
 <div class="soundbar" role="group" aria-label="Ton">
   <button class="sb" id="sbBgm" aria-pressed="false"><span class="eq"><i></i><i></i><i></i></span><s>BGM</s></button>
-  <button class="sb" id="sbSe" aria-pressed="false"><em>&#10035;</em><s>SE</s></button>
+  <button class="sb" id="sbSe" aria-pressed="false"><span class="wv"><i></i><i></i><i></i></span><s>SE</s></button>
 </div>
 <div id="veil"></div>
 
@@ -2814,6 +2822,7 @@ function startSession() {
 }
 
 function nextItem() {
+  paintShaky(false);
   const s = SESSION;
   if (s.at >= s.q.length) return endSession();
   const item = s.q[s.at];
@@ -2887,8 +2896,15 @@ function paintVerdict(head, cls) {
       <span class="why">${esc(w.de)} — ${esc(w.en)} · box ${bx}, back in ${BOXES[bx] || 1} day${BOXES[bx] === 1 ? '' : 's'}</span>
       ${d.why ? `<span class="why">${d.why}</span>` : ''}
       ${beispiel}
-      ${cls === 'ok' ? `<button class="shaky" id="btnShaky">🤔 I wasn't sure — bring it back</button>` : ''}
     </div>`;
+  paintShaky(cls === 'ok');
+}
+
+/* The shaky button lives outside the card now - quiet, but one tap away. */
+function paintShaky(on) {
+  const slot = $('#shakySlot');
+  if (!slot) return;
+  slot.innerHTML = on ? `<button class="shaky" id="btnShaky">🤔 I wasn't sure — bring it back</button>` : '';
   const sh = $('#btnShaky');
   if (sh) sh.onclick = markShaky;
 }
@@ -3466,7 +3482,6 @@ const NAV = (() => {
       const href = a.getAttribute('href');
       if (!href || href.charAt(0) === '#' || href.indexOf(':') > -1 || a.target === '_blank' || a.hasAttribute('download')) return;
       e.preventDefault();
-      KLANG.se('page');
       leave(a.href);
     });
     // coming back with the back button must never leave the veil down

@@ -134,6 +134,12 @@ h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:upp
 .eq i:nth-child(2){animation-delay:.19s}
 .eq i:nth-child(3){animation-delay:.38s}
 @keyframes eqb{0%,100%{height:3px}50%{height:12px}}
+.wv{position:relative;display:block;width:13px;height:12px}
+.wv i{position:absolute;top:50%;left:0;border:1.5px solid transparent;border-right-color:currentColor;
+  border-radius:50%;transform:translateY(-50%)}
+.wv i:nth-child(1){width:4px;height:4px}
+.wv i:nth-child(2){width:8px;height:8px}
+.wv i:nth-child(3){width:12px;height:12px}
 
 /* ---------- a header that cannot overflow ---------- */
 body{overflow-x:clip}
@@ -212,7 +218,7 @@ body{overflow-x:clip}
 <div class="toast" id="toast"></div>
 <div class="soundbar" role="group" aria-label="Ton">
   <button class="sb" id="sbBgm" aria-pressed="false"><span class="eq"><i></i><i></i><i></i></span><s>BGM</s></button>
-  <button class="sb" id="sbSe" aria-pressed="false"><em>&#10035;</em><s>SE</s></button>
+  <button class="sb" id="sbSe" aria-pressed="false"><span class="wv"><i></i><i></i><i></i></span><s>SE</s></button>
 </div>
 <div id="veil"></div>
 
@@ -618,7 +624,6 @@ const NAV = (() => {
       const href = a.getAttribute('href');
       if (!href || href.charAt(0) === '#' || href.indexOf(':') > -1 || a.target === '_blank' || a.hasAttribute('download')) return;
       e.preventDefault();
-      KLANG.se('page');
       leave(a.href);
     });
     // coming back with the back button must never leave the veil down
