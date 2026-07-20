@@ -34,7 +34,7 @@ body{
 }
 a{color:inherit;text-decoration:none}
 button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
-.wrap{max-width:760px;margin:0 auto;padding:0 14px 60px}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px 96px}
 
 /* ---------- header ---------- */
 .top{position:relative;z-index:40;background:var(--ink);color:var(--paper);margin:0 0 0;padding:10px 14px 8px}
@@ -97,13 +97,43 @@ h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:upp
 .badge s{display:block;text-decoration:none;font-size:10px;color:var(--ink-60);margin-top:3px;line-height:1.2}
 .badge em{font-style:normal;font-size:19px;display:block;margin-bottom:3px}
 
-.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--ink);color:var(--paper);
+.toast{position:fixed;left:50%;bottom:74px;transform:translate(-50%,20px);background:var(--ink);color:var(--paper);
   padding:10px 16px;border-radius:var(--r);font-family:var(--disp);font-size:18px;letter-spacing:.05em;text-transform:uppercase;
   z-index:80;opacity:0;pointer-events:none;transition:.25s}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .storewarn{background:var(--rot);color:#fff;padding:11px 13px;border-radius:var(--r);margin:14px 0;font-size:13.5px;line-height:1.4}
 .storewarn b{font-family:var(--disp);font-size:18px;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:2px}
 .hide{display:none!important}
+
+/* ---------- Ton · KLANG ---------- */
+.soundbar{position:fixed;right:12px;bottom:12px;z-index:70;display:flex;gap:2px;background:var(--ink);
+  border-radius:999px;padding:4px;box-shadow:0 3px 16px rgba(22,24,29,.3)}
+.sb{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  width:44px;height:44px;border-radius:999px;color:rgba(231,232,227,.45);transition:color .2s,background .2s}
+.sb em{font-style:normal;font-size:16px;line-height:1;display:block;height:12px}
+.sb s{text-decoration:none;font-family:var(--mono);font-size:8px;letter-spacing:.1em;line-height:1}
+.sb[aria-pressed="true"]{color:var(--gelb);background:rgba(232,162,0,.15)}
+.sb[aria-pressed="false"]::after{content:"";position:absolute;left:11px;right:11px;top:50%;height:1.5px;
+  background:currentColor;border-radius:1px;transform:rotate(-27deg);opacity:.75}
+.eq{display:flex;gap:2px;align-items:flex-end;height:12px}
+.eq i{width:2.5px;height:3px;background:currentColor;border-radius:1px}
+.sb[aria-pressed="true"] .eq i{animation:eqb .95s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:.19s}
+.eq i:nth-child(3){animation-delay:.38s}
+@keyframes eqb{0%,100%{height:3px}50%{height:12px}}
+
+/* ---------- soft transitions ---------- */
+#veil{position:fixed;inset:0;background:var(--paper);z-index:200;pointer-events:none;opacity:0;
+  animation:veilOut .42s ease-out both}
+#veil.leaving{animation:veilIn .2s ease-in both}
+@keyframes veilOut{from{opacity:1}to{opacity:0}}
+@keyframes veilIn{from{opacity:0}to{opacity:1}}
+.vfade{animation:vfade .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes vfade{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.cardin{animation:cardin .26s cubic-bezier(.2,.8,.2,1) both}
+@keyframes cardin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.verdict{animation:cardin .26s cubic-bezier(.2,.8,.2,1) both}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 :focus-visible{outline:3px solid var(--blau);outline-offset:2px}
 @media(max-width:560px){.packgrid{grid-template-columns:1fr}}
@@ -159,6 +189,12 @@ h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:upp
 
 </main>
 <div class="toast" id="toast"></div>
+<div class="soundbar" role="group" aria-label="Ton">
+  <button class="sb" id="sbBgm" aria-pressed="false"><span class="eq"><i></i><i></i><i></i></span><s>BGM</s></button>
+  <button class="sb" id="sbSe" aria-pressed="false"><em>&#10035;</em><s>SE</s></button>
+</div>
+<div id="veil"></div>
+
 
 <script>
 /* ============================================================
@@ -318,7 +354,260 @@ function paintResume(packs) {
     '<br><a class="btn" style="margin-top:9px" href="' + file + '">Weiter →</a>';
 }
 
+
+/* ============================================================
+   KLANG — sound, in two switches.
+   BGM  a slow generative piano, built from oscillators at run
+        time: four chords, a pentatonic melody that never quite
+        repeats, one soft delay standing in for a room.
+   SE   short piano flourishes on the moments that matter.
+   No audio files, no network — the same rule as everything else
+   here. This block is identical in every page of the app.
+   ============================================================ */
+const KLANG = (() => {
+  const KEY = 'wortwerk:klang';
+  const pref = { bgm: false, se: true, vol: .8 };
+
+  let ctx = null, master = null, room = null, busM = null, busS = null;
+  let clock = null, beat = 0, nextAt = 0, walk = 4, told = false;
+
+  const BEAT = 1.05;                                   // 57 bpm — walking pace, not marching
+  const CHORDS = [                                     // D · Bm · G · A, eight beats each
+    { bass: 38, tones: [50, 57, 62, 66] },
+    { bass: 35, tones: [47, 54, 59, 62] },
+    { bass: 31, tones: [43, 50, 55, 59] },
+    { bass: 33, tones: [45, 52, 57, 61] }
+  ];
+  const SCALE = [57, 62, 64, 66, 69, 71, 74, 76];      // D major pentatonic, A3 to E5
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  /* ---- preference: localStorage now, account storage when it answers ---- */
+  function load() {
+    try { const v = localStorage.getItem(KEY); if (v) Object.assign(pref, JSON.parse(v)); } catch (e) { }
+    (async () => {
+      try {
+        if (window.storage) {
+          const r = await window.storage.get(KEY);
+          if (r) { Object.assign(pref, JSON.parse(r.value)); paint(); apply(); }
+        }
+      } catch (e) { }
+    })();
+  }
+  function store() {
+    const s = JSON.stringify(pref);
+    try { localStorage.setItem(KEY, s); } catch (e) { }
+    try { if (window.storage) window.storage.set(KEY, s); } catch (e) { }
+  }
+
+  /* ---- the instrument ---- */
+  function build() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    try { ctx = new AC(); } catch (e) { return null; }
+
+    master = ctx.createGain(); master.gain.value = pref.vol * .9; master.connect(ctx.destination);
+
+    // one feedback delay through a low-pass: a room, for the price of four nodes
+    room = ctx.createGain(); room.gain.value = .3;
+    const dl = ctx.createDelay(1), fb = ctx.createGain(), lp = ctx.createBiquadFilter();
+    dl.delayTime.value = .27; fb.gain.value = .33;
+    lp.type = 'lowpass'; lp.frequency.value = 1500;
+    room.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(master);
+
+    // the music runs through its own tone control: a gentle low-pass and a
+    // shelf that take the top off every note before it can ever get shrill
+    busM = ctx.createGain(); busM.gain.value = 0;      // music, always faded not cut
+    const soft = ctx.createBiquadFilter(), tilt = ctx.createBiquadFilter();
+    soft.type = 'lowpass'; soft.frequency.value = 1250; soft.Q.value = .5;
+    tilt.type = 'highshelf'; tilt.frequency.value = 900; tilt.gain.value = -11;
+    busM.connect(soft); soft.connect(tilt); tilt.connect(master); tilt.connect(room);
+
+    busS = ctx.createGain(); busS.gain.value = .9;     // effects, left crisp
+    busS.connect(master); busS.connect(room);
+    return ctx;
+  }
+
+  /* One note. Four slightly stretched partials plus a hammer tick:
+     enough inharmonicity to read as a piano, cheap enough to spam. */
+  const PARTIALS = [[1, 1], [2.003, .3], [3.011, .11], [4.02, .045]];
+  function note(midi, at, dur, vol, bus, soft) {
+    if (!ctx) return;
+    const t = Math.max(at, ctx.currentTime + .004), f = mtof(midi);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(.0005, vol), t + .01);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    g.connect(bus);
+    (soft ? PARTIALS.slice(0, 3) : PARTIALS).forEach(([m, a]) => {
+      const o = ctx.createOscillator(), pg = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f * m; pg.gain.value = a;
+      o.connect(pg); pg.connect(g); o.start(t); o.stop(t + dur + .06);
+    });
+    const h = ctx.createOscillator(), hg = ctx.createGain();
+    h.type = 'triangle'; h.frequency.value = f * (soft ? 3.02 : 5.2);
+    hg.gain.setValueAtTime(vol * (soft ? .05 : .2), t);
+    hg.gain.exponentialRampToValueAtTime(.0001, t + .045);
+    h.connect(hg); hg.connect(bus); h.start(t); h.stop(t + .09);
+  }
+
+  /* ---- the music: written one beat ahead, never looped ---- */
+  function schedule(t, b) {
+    const ch = CHORDS[Math.floor(b / 8) % CHORDS.length], step = b % 8;
+    if (step === 0) {
+      note(ch.bass, t, 7, .055, busM, true);
+      ch.tones.forEach((m, i) => note(m, t + .09 + i * .38, 4.5, .032, busM, true));
+    } else if (step === 4) {
+      note(ch.bass + 7, t, 5, .035, busM, true);
+    }
+    if (step % 2 === 1 || Math.random() < .22) {
+      if (Math.random() < .42) return;                 // rests are half the music
+      walk = Math.max(0, Math.min(SCALE.length - 1, walk + Math.round(rand(-2.4, 2.4))));
+      const m = SCALE[walk];
+      note(m, t + rand(0, .12), rand(2.4, 3.8), rand(.05, .09) * (m > 71 ? .8 : 1), busM, true);
+      if (Math.random() < .18) note(m - 12, t + .13, 3.4, .03, busM, true);  // an octave down, for warmth
+    }
+  }
+  function tick() {
+    if (!ctx) return;
+    const look = ctx.currentTime + 1.3;
+    while (nextAt < look) { schedule(nextAt, beat); beat++; nextAt += BEAT; }
+  }
+  function startMusic() {
+    if (!build() || clock) return;
+    nextAt = ctx.currentTime + .25; tick();
+    clock = setInterval(tick, 260);
+    busM.gain.cancelScheduledValues(ctx.currentTime);
+    busM.gain.setValueAtTime(Math.max(.0001, busM.gain.value), ctx.currentTime);
+    busM.gain.linearRampToValueAtTime(1, ctx.currentTime + 2.2);
+  }
+  function stopMusic(fade) {
+    if (clock) { clearInterval(clock); clock = null; }
+    if (!ctx) return;
+    busM.gain.cancelScheduledValues(ctx.currentTime);
+    busM.gain.setValueAtTime(busM.gain.value, ctx.currentTime);
+    busM.gain.linearRampToValueAtTime(0, ctx.currentTime + (fade === false ? .05 : 1.1));
+  }
+
+  /* ---- the effects ---- */
+  const SE = {
+    page: [[71, 0, .5, .035]],
+    tap: [[76, 0, .5, .05]],
+    start: [[69, 0, .7, .06], [76, .08, 1, .05]],
+    right: [[76, 0, .6, .08], [81, .085, .95, .055]],
+    wrong: [[59, 0, .5, .065], [57, .1, .75, .05]],
+    shaky: [[66, 0, .8, .055], [64, .12, 1, .045]],
+    combo: [[69, 0, .7, .06], [73, .07, .7, .06], [76, .14, .8, .06], [81, .21, 1.2, .06]],
+    level: [[62, 0, 1.4, .075], [66, .075, 1.3, .07], [69, .15, 1.3, .07], [74, .225, 1.6, .07], [78, .3, 1.9, .06]],
+    badge: [[81, 0, 1.7, .055], [85, .09, 1.6, .05], [88, .18, 2, .045]],
+    done: [[50, 0, 2.6, .05], [57, .03, 2.4, .045], [62, .06, 2.4, .045], [66, .09, 2.2, .04]]
+  };
+  function se(name) {
+    if (!pref.se || !SE[name] || !build() || ctx.state !== 'running') return;
+    const t0 = ctx.currentTime + .01;
+    SE[name].forEach(([m, o, d, v]) => note(m, t0 + o, d, v, busS));
+  }
+
+  /* ---- gates: browsers only make sound after a real gesture ---- */
+  function apply() {
+    if (!pref.bgm) { stopMusic(); return; }
+    if (!build()) return;
+    if (ctx.state === 'running') startMusic();
+    else ctx.resume().then(startMusic).catch(() => { });
+  }
+  function unlock() {
+    if (!build()) return;
+    if (ctx.state !== 'running') ctx.resume().catch(() => { });
+    if (pref.bgm) setTimeout(apply, 60);
+  }
+
+  function paint() {
+    const m = document.getElementById('sbBgm'), s = document.getElementById('sbSe');
+    if (m) { m.setAttribute('aria-pressed', !!pref.bgm); m.title = pref.bgm ? 'Musik aus' : 'Musik an'; }
+    if (s) { s.setAttribute('aria-pressed', !!pref.se); s.title = pref.se ? 'Effekte aus' : 'Effekte an'; }
+  }
+  function say(msg) { try { if (typeof toast === 'function') toast(msg); } catch (e) { } }
+
+  function toggle(what) {
+    pref[what] = !pref[what];
+    store(); paint();
+    if (what === 'bgm') { apply(); say(pref.bgm ? 'Musik an' : 'Musik aus'); }
+    else { if (pref.se) se('right'); say(pref.se ? 'Effekte an' : 'Effekte aus'); }
+  }
+
+  function wire() {
+    load(); paint();
+    const m = document.getElementById('sbBgm'), s = document.getElementById('sbSe');
+    if (m) m.onclick = () => toggle('bgm');
+    if (s) s.onclick = () => toggle('se');
+
+    ['pointerdown', 'keydown'].forEach(ev =>
+      window.addEventListener(ev, function once() {
+        ['pointerdown', 'keydown'].forEach(e2 => window.removeEventListener(e2, once));
+        unlock();
+      }, { passive: true }));
+
+    // leaving the tab shouldn't leave a piano playing to an empty room
+    document.addEventListener('visibilitychange', () => {
+      if (!ctx) return;
+      if (document.hidden) { stopMusic(false); ctx.suspend().catch(() => { }); }
+      else if (pref.bgm) ctx.resume().then(startMusic).catch(() => { });
+    });
+
+    if (pref.bgm) {
+      apply();
+      setTimeout(() => {
+        if (!told && (!ctx || ctx.state !== 'running')) { told = true; say('Musik startet beim ersten Tippen'); }
+      }, 900);
+    }
+  }
+
+  return { wire, se, toggle, pref, playing: () => !!clock };
+})();
+
+/* ============================================================
+   NAV — softer page changes.
+   One veil per page: it fades out on arrival (pure CSS, so it
+   works even if this script never runs) and fades in before a
+   link takes you elsewhere. Reduced-motion users get neither.
+   ============================================================ */
+const NAV = (() => {
+  const still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const veil = () => document.getElementById('veil');
+
+  function leave(href) {
+    const v = veil();
+    if (still || !v) { location.href = href; return; }
+    v.classList.add('leaving');
+    setTimeout(() => { location.href = href; }, 200);
+  }
+  /* re-trigger an entrance animation on an element that is already in the DOM */
+  function enter(el, cls) {
+    if (!el || still) return;
+    el.classList.remove(cls || 'vfade');
+    void el.offsetWidth;
+    el.classList.add(cls || 'vfade');
+  }
+  function wire() {
+    document.addEventListener('click', e => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target instanceof Element ? e.target.closest('a[href]') : null;
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.charAt(0) === '#' || href.indexOf(':') > -1 || a.target === '_blank' || a.hasAttribute('download')) return;
+      e.preventDefault();
+      KLANG.se('page');
+      leave(a.href);
+    });
+    // coming back with the back button must never leave the veil down
+    window.addEventListener('pageshow', () => { const v = veil(); if (v) v.classList.remove('leaving'); });
+  }
+  return { wire, leave, enter };
+})();
+
 async function boot() {
+  KLANG.wire(); NAV.wire();
   const profile = await STORE.get(K_PROFILE) || {};
   const packs = await STORE.get(K_PACKS) || {};
 
