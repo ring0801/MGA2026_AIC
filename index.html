@@ -135,6 +135,15 @@ h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:upp
 .eq i:nth-child(3){animation-delay:.38s}
 @keyframes eqb{0%,100%{height:3px}50%{height:12px}}
 
+/* ---------- a header that cannot overflow ---------- */
+body{overflow-x:clip}
+.top-row{gap:8px;min-width:0}
+.top-row .chip{flex:0 0 auto}
+.xplabel{gap:10px}
+.xplabel span{flex:0 0 auto}
+.xplabel .rnk{flex:1 1 auto;min-width:0;text-align:center;color:var(--gelb);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 /* ---------- soft transitions ---------- */
 #veil{position:fixed;inset:0;background:var(--paper);z-index:200;pointer-events:none;opacity:0;
   animation:veilOut .42s ease-out both}
@@ -160,11 +169,10 @@ h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:upp
     <div class="mark">Wort<span>werk</span></div>
     <div class="spacer"></div>
     <div class="chip" id="chLevel">Stufe 1</div>
-    <div class="chip" id="chRank"></div>
     <div class="chip fire" id="chStreak">0 Tage</div>
   </div>
   <div class="xpbar"><i id="xpFill"></i></div>
-  <div class="xplabel"><span id="xpNow">0 XP</span><span id="xpNext">100 XP → Stufe 2</span></div>
+  <div class="xplabel"><span id="xpNow">0 XP</span><span class="rnk" id="chRank"></span><span id="xpNext">100 XP → Stufe 2</span></div>
 </header>
 
 <main class="wrap">
