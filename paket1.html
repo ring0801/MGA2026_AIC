@@ -3,6 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- Home-screen app. The manifest's "scope" is what keeps every Paket inside
+     the app instead of bouncing it into an in-app Safari view; the apple-*
+     tags are the same instruction for iOS versions that predate manifests.
+     All same-origin: still no external requests. -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wortwerk">
+<meta name="theme-color" content="#16181D">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
 <title>Wortwerk — German to C2</title>
 <!-- No external requests. Nothing about your use of this app leaves the device.
      To restore the original Barlow Condensed / IBM Plex typography, delete the
@@ -35,10 +48,10 @@ body{
 a{color:inherit;text-decoration:none}
 button,input,select{font-family:inherit;font-size:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
-.wrap{max-width:760px;margin:0 auto;padding:0 14px 96px}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px 96px;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 
 /* ---------- header ---------- */
-.top{position:relative;z-index:40;background:var(--ink);color:var(--paper);margin:0 -14px 0;padding:10px 14px 8px}
+.top{position:relative;z-index:40;background:var(--ink);color:var(--paper);margin:0 -14px 0;padding:10px 14px 8px;padding-top:calc(10px + env(safe-area-inset-top))}
 .top-row{display:flex;align-items:center;gap:10px;max-width:732px;margin:0 auto}
 .mark{font-family:var(--disp);font-weight:700;font-size:26px;letter-spacing:.06em;text-transform:uppercase;line-height:1}
 .mark span{color:var(--gelb)}
@@ -198,7 +211,7 @@ details.acc .in{padding:0 13px 13px}
 /* ---------- sheet ---------- */
 .sheet-bg{position:fixed;inset:0;background:rgba(22,24,29,.55);z-index:60;display:none}
 .sheet-bg.on{display:block}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--paper);border-top-left-radius:12px;border-top-right-radius:12px;
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--paper);padding-bottom:env(safe-area-inset-bottom);border-top-left-radius:12px;border-top-right-radius:12px;
   max-height:86vh;overflow-y:auto;transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.8,.2,1);padding:0 14px 30px}
 .sheet.on{transform:translateY(0)}
 .sheet-head{position:sticky;top:0;background:var(--paper);padding:12px 0 8px;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--line);margin-bottom:12px}
@@ -214,7 +227,7 @@ details.acc .in{padding:0 13px 13px}
 .badge s{display:block;text-decoration:none;font-size:10.5px;color:var(--ink-60);margin-top:3px;line-height:1.25}
 .badge em{font-style:normal;font-size:20px;display:block;margin-bottom:3px}
 
-.toast{position:fixed;left:50%;bottom:74px;transform:translate(-50%,20px);background:var(--ink);color:var(--paper);
+.toast{position:fixed;left:50%;bottom:74px;bottom:calc(74px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--paper);
   padding:10px 16px;border-radius:var(--r);font-family:var(--disp);font-size:18px;letter-spacing:.05em;text-transform:uppercase;
   z-index:80;opacity:0;pointer-events:none;transition:.25s}
 .toast.on{opacity:1;transform:translate(-50%,0)}
@@ -225,7 +238,7 @@ details.acc .in{padding:0 13px 13px}
 @keyframes pl{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
 
 /* ---------- Ton · KLANG ---------- */
-.soundbar{position:fixed;right:12px;bottom:12px;z-index:70;display:flex;gap:2px;background:var(--ink);
+.soundbar{position:fixed;right:12px;bottom:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:70;display:flex;gap:2px;background:var(--ink);
   border-radius:999px;padding:4px;box-shadow:0 3px 16px rgba(22,24,29,.3)}
 .sb{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   width:44px;height:44px;border-radius:999px;color:rgba(231,232,227,.45);transition:color .2s,background .2s}
