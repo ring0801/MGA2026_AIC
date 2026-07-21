@@ -369,6 +369,7 @@ body{overflow-x:clip}
   border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:14px 0 4px;text-align:left}
 .endher>div{display:flex;flex-direction:column;gap:2px;min-width:0}
 .endher b{font-family:var(--disp);font-size:20px;line-height:1.15}
+.endher i{font-size:14.5px;line-height:1.35;margin-top:3px}
 .endher .muted{font-size:12px;font-family:var(--mono)}
 @media(max-width:420px){.endher b{font-size:17px}}
 
@@ -2975,7 +2976,7 @@ function stats() {
     const k = SRS.key(w.i, s);
     if (!S.sched[k]) unseen++; else if (S.sched[k][1] <= today()) due++;
   }));
-  PACKS[PACK.id] = { name: PACK.name, order: PACK.order, total: LEX.length, learned, mastered, due, at: today() };
+  PACKS[PACK.id] = { name: PACK.name, order: PACK.order, total: LEX.length, learned, mastered, due, wach: (S.reich && S.reich.wach && S.reich.wach[PACK.id]) || 0, at: today() };
   return { learned, mastered, seen, due, unseen };
 }
 /* Route to C2 counts every pack you've installed, not just this one. */
@@ -3755,7 +3756,20 @@ const PROVINZ = [
   { pack: 'p5', code: 'C1', land: 'Turm', col: '#E8A200', her: 'Elisabeth' },
   { pack: 'p6', code: 'C2', land: 'Krone', col: '#CE3B2B', her: 'Friederike' }
 ];
-const SCHLAF = 40;                 /* overdue items before a province sleeps */
+const SCHLAF = 40;   /* backlog that counts as neglect, before we know better */
+const RUHE = 3;      /* days away before a province lies down */
+
+/* A province sleeps because you have been away, not because a backlog is
+   large. Coming back with three hundred overdue items and having to clear
+   them all before anything visible happens is the opposite of an invitation.
+   One finished run wakes her; the backlog only decides how thick the hedge
+   is drawn while she is out. */
+function schlaeft(p, st) {
+  if (!st || !st.built) return false;
+  const w = S.reich && S.reich.wach ? S.reich.wach[p.pack] : 0;
+  if (!w) return st.due >= SCHLAF;
+  return (today() - w) >= RUHE && st.due >= 20;
+}
 const STUFE_NAME = ['Saat', 'Knospe', 'Blüte', 'Krone'];
 
 /* ---------- 7.3 the sprite: 12 x 16 characters per stage ---------- */
@@ -3866,6 +3880,24 @@ function spriteSVG(stufe, col, o) {
   return out + '</svg>';
 }
 
+const BAU_NAME = {
+  weg: 'Ein Weg', blume: 'Die ersten Blumen', haus: 'Ein Haus', baum: 'Ein Baum',
+  obst: 'Ein Obstbaum', teich: 'Ein Teich', turm: 'Ein Turm', zaun: 'Ein Rosenzaun', sonne: 'Die Sonne'
+};
+function bauListe(fl, fm) {
+  const out = [];
+  if (fl > 0) out.push('weg');
+  if (fl >= 0.02) out.push('blume');
+  if (fl >= 0.05) out.push('haus');
+  if (fl >= 0.10) out.push(fm >= 0.08 ? 'obst' : 'baum');
+  if (fl >= 0.18) out.push('teich');
+  if (fl >= 0.25) out.push('turm');
+  if (fl >= 0.35) out.push(fm >= 0.15 ? 'obst' : 'baum');
+  if (fl >= 0.50) out.push('zaun');
+  if (fm >= 0.30) out.push('sonne');
+  return out;
+}
+
 /* ---------- the province landscape ----------
    Nothing here is placed by hand and nothing is random: each motif has a
    threshold, so the same progress always builds the same country. It is a
@@ -3874,15 +3906,7 @@ function sceneSVG(col, o) {
   o = o || {};
   const fl = o.fl || 0, fm = o.fm || 0, sleep = !!o.sleep, extra = o.extra || [];
   const W = 78, H = 22, GY = 20;
-  const items = [];
-  if (fl > 0) items.push('weg');
-  if (fl >= 0.02) items.push('blume');
-  if (fl >= 0.05) items.push('haus');
-  if (fl >= 0.10) items.push(fm >= 0.08 ? 'obst' : 'baum');
-  if (fl >= 0.18) items.push('teich');
-  if (fl >= 0.25) items.push('turm');
-  if (fl >= 0.35) items.push(fm >= 0.15 ? 'obst' : 'baum');
-  if (fl >= 0.50) items.push('zaun');
+  const items = bauListe(fl, fm).filter(id => id !== 'sonne');
   extra.forEach(id => { if (MOT[id]) items.push(id); });
 
   const dull = c => sleep ? '#B4B2A9' : c;
@@ -3890,7 +3914,7 @@ function sceneSVG(col, o) {
     'preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges" aria-hidden="true">';
   const gamt = Math.max(0, 0.78 - Math.min(0.78, fl * 1.6));
   out += '<rect x="0" y="' + GY + '" width="' + W + '" height="1" fill="' + (sleep ? '#C4C3BA' : tint('#1F9E63', gamt)) + '"/>';
-  if (!sleep && fm >= 0.30) out += '<rect x="70" y="1" width="3" height="3" fill="#E8A200"/>';
+  if (!sleep && bauListe(fl, fm).indexOf('sonne') >= 0) out += '<rect x="70" y="1" width="3" height="3" fill="#E8A200"/>';
 
   items.slice(0, 7).forEach((id, i) => {
     const m = MOT[id]; if (!m) return;
@@ -3974,6 +3998,9 @@ function reichInit() {
   if (!R.kleid) R.kleid = {};
   if (!R.land) R.land = {};
   if (R.mast == null) R.mast = 0;
+  if (!R.wach) R.wach = {};
+  if (!R.stufe) R.stufe = {};
+  if (!R.bau) R.bau = {};
   /* Progress earned before the realm existed is not backpaid — otherwise a
      long-standing learner would open this to thousands of Sterne and nothing
      left to want. The baseline is set once, with a small gift to start. */
@@ -4004,40 +4031,105 @@ const tended = () => PROVINZ.find(p => p.pack === (S.reich && S.reich.tend)) || 
 const worn = pk => (S.reich.kleid[pk] || []);
 const built = pk => (S.reich.land[pk] || []);
 
+/* ---------- 7.7c letters ----------
+   Written at the level of the pack they belong to, so the note itself is
+   reading practice. They rotate by session count rather than at random,
+   which guarantees variety instead of merely hoping for it. */
+const BRIEFE = {
+  gut: [
+    ['Heute war nichts zu schwer für dich.', 'Nothing was too hard for you today.'],
+    ['Du hast fast alles behalten. Ich bin stolz.', 'You kept almost all of it. I am proud.'],
+    ['So schnell wächst mein Land.', 'This is how fast my country grows.'],
+    ['Sehr gut. Ruh dich jetzt aus.', 'Very good. Now rest.'],
+    ['Ich habe mitgezählt. Es waren viele.', 'I was counting along. There were a lot.'],
+    ['Bleib so. Mehr brauche ich nicht.', 'Stay like this. I need nothing more.'],
+    ['Ein guter Tag für uns beide.', 'A good day for us both.']
+  ],
+  ok: [
+    ['Gut gemacht. Der Rest kommt morgen wieder.', 'Well done. The rest comes back tomorrow.'],
+    ['Ein paar Wörter sind weggelaufen. Sie kommen zurück.', 'A few words ran off. They will come back.'],
+    ['Das reicht für heute.', 'That is enough for today.'],
+    ['Wir sind weiter als gestern.', 'We are further along than yesterday.'],
+    ['Nicht alles, aber genug.', 'Not everything, but enough.'],
+    ['Ich lasse das Licht an, bis du wiederkommst.', 'I will leave the light on until you come back.']
+  ],
+  ruhig: [
+    ['Schwere Runde. Das macht nichts.', 'A hard round. It does not matter.'],
+    ['Die Wörter kommen wieder. Immer.', 'The words come back. They always do.'],
+    ['Du warst da. Das zählt schon.', 'You were here. That counts already.'],
+    ['Langsam ist auch ein Weg.', 'Slow is also a way.'],
+    ['Morgen ist wieder ein Feld.', 'Tomorrow there is another field.'],
+    ['Setz dich kurz. Wir haben Zeit.', 'Sit down a moment. We have time.']
+  ]
+};
+
 /* ---------- 7.8 Sterne — milestones only, never volume ---------- */
 function reichAfter() {
   reichInit();
   const R = S.reich, s = (typeof SESSION !== 'undefined' && SESSION) ? SESSION : null;
-  const st = stats();
+  const pk = PACK.id, p = PROVINZ.find(x => x.pack === pk) || tended();
+  /* Quitting halfway is not a run. Nothing is announced and nobody wakes. */
+  const fertig = !!(s && s.q && s.q.length && s.at >= s.q.length);
+  const st = provStat(p, true);
+
+  const warSchlaf = schlaeft(p, st);
+  const warStufe = R.stufe[pk] == null ? stufeOf(st) : R.stufe[pk];
+  const warBau = R.bau[pk] || [];
+
   let got = 0; const why = [];
   const dm = Math.max(0, st.mastered - (R.mast || 0));
   if (dm) { got += dm * 3; why.push(dm + ' gemeistert'); }
   R.mast = st.mastered;
-  if (s && s.q && s.q.length >= 10 && s.right === s.q.length) { got += 5; why.push('makellos'); }
-  if (S.lastDay !== R.day) { got += 2; why.push('neuer Tag'); R.day = S.lastDay; }
+  if (fertig && s.q.length >= 10 && s.right === s.q.length) { got += 5; why.push('makellos'); }
+  if (fertig && S.lastDay !== R.day) { got += 2; why.push('neuer Tag'); R.day = S.lastDay; }
   if (got) R.sterne += got;
+  if (fertig) R.wach[pk] = today();
+
+  const nunStufe = stufeOf(st);
+  const nunBau = bauListe(st.total ? st.learned / st.total : 0, st.total ? st.mastered / st.total : 0);
+  const neuBau = nunBau.filter(id => warBau.indexOf(id) < 0);
+  R.stufe[pk] = nunStufe; R.bau[pk] = nunBau;
+
   FOCUS = null;
   save(true);
 
   const host = $('#endMissed');
   if (host) {
-    const tp = tended(), tst = provStat(tp, true), tsl = tst.due >= SCHLAF, tstu = stufeOf(tst);
-    const pct = (s && s.q && s.q.length) ? s.right / s.q.length : 0;
-    const face = tsl ? 'schlaf' : pct >= 0.9 ? 'freude' : pct >= 0.7 ? 'laecheln' : 'ruhe';
-    mood(face, 30000);
-    const say = tsl ? tp.her + ' schläft noch — ein Feld genügt, um sie zu wecken.'
-      : pct >= 0.9 ? tp.her + ' strahlt.'
-        : pct >= 0.7 ? tp.her + ' lächelt.'
-          : tp.her + ' nickt dir ruhig zu.';
     let panel = $('#endHer');
     if (!panel) { panel = document.createElement('div'); panel.id = 'endHer'; panel.className = 'endher'; host.parentNode.insertBefore(panel, host); }
-    panel.innerHTML = spriteSVG(tstu, tp.col, { px: 6, sleep: tsl, worn: worn(tp.pack), face: face }) +
-      '<div><b>' + say + '</b><span class="muted">' + tp.code + ' · ' + tp.land + ' · ' + STUFE_NAME[tstu] + '</span></div>';
     let line = $('#endSterne');
     if (!line) { line = document.createElement('p'); line.id = 'endSterne'; line.className = 'sterneline'; host.parentNode.insertBefore(line, host); }
-    line.innerHTML = got
-      ? '<b>✦ +' + got + ' Sterne</b> <span class="muted">· ' + why.join(' · ') + '</span>'
-      : '<span class="muted">Keine Sterne diesmal — sie kommen von Meilensteinen, nicht von Menge.</span>';
+
+    if (!fertig) {
+      panel.style.display = 'none';
+      line.innerHTML = '<span class="muted">Runde abgebrochen — nichts geht verloren.</span>';
+    } else {
+      panel.style.display = '';
+      const pct = s.right / s.q.length;
+      const face = pct >= 0.9 ? 'freude' : pct >= 0.7 ? 'laecheln' : 'ruhe';
+      mood(face, 30000);
+
+      /* one headline, in order of how rare it is */
+      let kopf, gross = false;
+      if (warSchlaf) { kopf = p.her + ' ist aufgewacht.'; gross = true; }
+      else if (nunStufe > warStufe) { kopf = p.her + ' ist gewachsen — ' + STUFE_NAME[nunStufe] + '.'; gross = true; }
+      else if (neuBau.length) { kopf = BAU_NAME[neuBau[neuBau.length - 1]] + ' ist entstanden.'; gross = true; }
+      else kopf = pct >= 0.9 ? p.her + ' strahlt.' : pct >= 0.7 ? p.her + ' lächelt.' : p.her + ' nickt dir ruhig zu.';
+
+      const bag = BRIEFE[pct >= 0.9 ? 'gut' : pct >= 0.7 ? 'ok' : 'ruhig'];
+      const br = bag[(S.sessions + s.q.length) % bag.length];
+
+      panel.innerHTML = spriteSVG(nunStufe, p.col, { px: 6, worn: worn(pk), face: face }) +
+        '<div><b>' + kopf + '</b>' +
+        '<i>&bdquo;' + br[0] + '&ldquo;</i>' +
+        '<span class="muted">' + br[1] + '</span></div>';
+
+      if (gross) { toast(kopf); setTimeout(function () { try { KLANG.se('level'); } catch (e) { } }, 500); }
+
+      line.innerHTML = got
+        ? '<b>✦ +' + got + ' Sterne</b> <span class="muted">· ' + why.join(' · ') + '</span>'
+        : '<span class="muted">Keine Sterne diesmal — sie kommen von Meilensteinen, nicht von Menge.</span>';
+    }
   }
   paintMini(); if (VIEW === 'reich') paintReich();
 }
@@ -4056,7 +4148,7 @@ function uebeFeld(fid) {
 function paintMini() {
   const el = $('#hofMini'); if (!el) return;
   reichInit();
-  const p = tended(), st = provStat(p, false), sl = st.due >= SCHLAF;
+  const p = tended(), st = provStat(p, false), sl = schlaeft(p, st);
   const sess = (typeof SESSION !== 'undefined') ? SESSION : null;
   if (sess && sess.combo !== LASTCOMBO) {
     const c = sess.combo; LASTCOMBO = c;           /* set first: mood() repaints */
@@ -4073,7 +4165,7 @@ function paintStrip() {
   reichInit();
   let s = $('#reichStrip');
   if (!s) { s = document.createElement('button'); s.id = 'reichStrip'; s.className = 'strip'; s.onclick = () => show('reich'); home.insertBefore(s, home.firstChild); }
-  const p = tended(), st = provStat(p, false), sl = st.due >= SCHLAF;
+  const p = tended(), st = provStat(p, false), sl = schlaeft(p, st);
   const run = $('#sessionRun');
   s.style.display = (run && !run.classList.contains('hide')) ? 'none' : 'flex';
   s.innerHTML = spriteSVG(stufeOf(st), p.col, { px: 3, sleep: sl, worn: worn(p.pack), face: faceNow(sl) }) +
@@ -4090,12 +4182,12 @@ function paintReich() {
 }
 
 function paintHof() {
-  const p = tended(), st = provStat(p), sl = st.due >= SCHLAF, stu = stufeOf(st);
+  const p = tended(), st = provStat(p), sl = schlaeft(p, st), stu = stufeOf(st);
   const roster = PROVINZ.map(q => {
-    const qs = provStat(q), on = q.pack === p.pack;
+    const qs = provStat(q), on = q.pack === p.pack, qsl = schlaeft(q, qs);
     return '<button class="pick' + (on ? ' on' : '') + (qs.built ? '' : ' off') + '" data-tend="' + q.pack + '"' +
       (qs.built ? '' : ' disabled') + ' title="' + q.her + '">' +
-      spriteSVG(stufeOf(qs), q.col, { px: 2, sleep: qs.due >= SCHLAF, worn: worn(q.pack), face: q.pack === p.pack ? faceNow(qs.due >= SCHLAF) : null }) +
+      spriteSVG(stufeOf(qs), q.col, { px: 2, sleep: qsl, worn: worn(q.pack), face: q.pack === p.pack ? faceNow(qsl) : null }) +
       '<span>' + q.her.slice(0, 1) + '</span></button>';
   }).join('');
 
@@ -4143,7 +4235,7 @@ function paintHof() {
 
 function paintKarte() {
   $('#reichKarte').innerHTML = PROVINZ.map(p => {
-    const st = provStat(p), sl = st.built && st.due >= SCHLAF, stu = stufeOf(st);
+    const st = provStat(p), sl = schlaeft(p, st), stu = stufeOf(st);
     const f = st.here ? reichFelder() : null;
     const plots = FELDER.map(fd => {
       if (!f) return '<i style="background:#DDDFD8"></i>';

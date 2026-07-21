@@ -56,6 +56,8 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;color:inhe
 .mark span{color:var(--gelb)}
 .chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:3px 7px;border:1px solid rgba(231,232,227,.35);border-radius:var(--r);white-space:nowrap}
 .chip.fire{border-color:var(--gelb);color:var(--gelb)}
+.chip.lang{font-weight:600;letter-spacing:.12em;opacity:.75;transition:opacity .2s}
+.chip.lang:hover,.chip.lang:focus-visible{opacity:1}
 .spacer{flex:1}
 .xpbar{max-width:732px;margin:8px auto 0;height:5px;background:rgba(231,232,227,.18);border-radius:2px;overflow:hidden}
 .xpbar i{display:block;height:100%;background:var(--gelb);width:0;transition:width .5s cubic-bezier(.2,.8,.2,1)}
@@ -220,8 +222,9 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
   <div class="top-row">
     <div class="mark">Wort<span>werk</span></div>
     <div class="spacer"></div>
-    <div class="chip" id="chLevel">Stufe 1</div>
-    <div class="chip fire" id="chStreak">0 Tage</div>
+    <button class="chip lang" id="langBtn" title="Deutsch / English">DE</button>
+    <div class="chip" id="chLevel">Level 1</div>
+    <div class="chip fire" id="chStreak">0 days</div>
   </div>
   <div class="xpbar"><i id="xpFill"></i></div>
   <div class="xplabel"><span id="xpNow">0 XP</span><span class="rnk" id="chRank"></span><span id="xpNext">100 XP → Stufe 2</span></div>
@@ -232,40 +235,47 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
 <div class="storewarn hide" id="storeWarn"></div>
 
 <div id="resume" class="panel hide" style="border-left:5px solid var(--gelb);margin-top:14px">
-  <p class="eyebrow">Weiter geht's</p>
+  <p class="eyebrow" data-t="resumeEyebrow"></p>
   <div id="resumeTxt" style="font-size:15px"></div>
 </div>
 
 <section>
   <p class="eyebrow" id="motto" style="margin-top:18px"></p>
-  <h2 class="sec" style="margin-top:0">Route nach C2</h2>
-  <p class="muted">Jedes Paket schreibt in dasselbe Konto — ein Level, eine Serie, eine Strecke.</p>
+  <h2 class="sec" style="margin-top:0" data-t="routeH"></h2>
+  <p class="muted" data-t="routeP"></p>
   <div class="strecke">
-    <p class="eyebrow">Wörter gelernt, über alle Pakete</p>
+    <p class="eyebrow" data-t="railEyebrow"></p>
     <div class="rail" id="rail"></div>
   </div>
 </section>
 
 <section>
-  <h2 class="sec">Das Reich</h2>
-  <p class="muted">Sechs Provinzen, eine Straße. Alles hier ist dein Fortschritt, neu gezeichnet — nichts davon kauft man mit Zeit.</p>
+  <h2 class="sec" data-t="reichH"></h2>
+  <p class="muted" data-t="reichP"></p>
   <div class="hofline" id="hofLine"></div>
   <div class="karte" id="reichKarte"></div>
 </section>
 
 <section>
-  <h2 class="sec">Wähle ein Paket</h2>
-  <p class="muted">Jedes Paket ist eine eigene Seite — dein Fortschritt bleibt trotzdem eine gemeinsame Geschichte.</p>
+  <h2 class="sec" data-t="packsH"></h2>
+  <p class="muted" data-t="packsP"></p>
   <div class="packgrid" id="packGrid"></div>
 </section>
 
 <section>
-  <h2 class="sec">Abzeichen</h2>
-  <p class="muted">Gesammelt über alle Pakete hinweg.</p>
+  <h2 class="sec" data-t="sideH"></h2>
+  <p class="muted" data-t="sideP1"></p>
+  <p class="muted" data-t="sideP2"></p>
+  <div id="feldweg"></div>
+</section>
+
+<section>
+  <h2 class="sec" data-t="badgesH"></h2>
+  <p class="muted" data-t="badgesP"></p>
   <div class="badges" id="badgeGrid"></div>
 </section>
 
-<p class="tiny" style="text-align:center;margin-top:30px">Speichert in <span id="storeMode">…</span> · keine externen Anfragen · keine Werbung, nie</p>
+<p class="tiny" style="text-align:center;margin-top:30px"><span data-t="footA"></span> <span id="storeMode">…</span> <span data-t="footB"></span></p>
 
 </main>
 <div class="toast" id="toast"></div>
@@ -283,6 +293,147 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
    writes anything itself: this page only routes and displays.
    ============================================================ */
 const K_PROFILE = 'wortwerk:profile';
+const K_GRAM    = 'wortwerk:gram';
+/* ============================================================
+   LANGUAGE
+
+   The hub speaks either language; the switch lives in the header
+   and is remembered like everything else. German proper names
+   (Wortwerk, the provinces, Der Feldweg) stay as they are in both
+   — they are names, not labels.
+   ============================================================ */
+const K_LANG = 'wortwerk:lang';
+let LANG = 'en';
+
+const T = {
+  en: {
+    docTitle: 'Wortwerk — Overview',
+    level: 'Level', day: 'day', days: 'days', xpTo: 'XP → level',
+    resumeEyebrow: 'Where you left off',
+
+    routeH: 'The road to C2',
+    routeP: 'Six waymarkers, twenty-one thousand words, one traveller. Every Paket writes into the same account, so the road remembers all of it — one level, one streak, one line drawn forward.',
+    railEyebrow: 'Words learned, across every Paket',
+
+    reichH: 'The Realm',
+    reichP: 'Six provinces along the road, each with a princess who grows as her province does. Nothing here is bought with time: every field, every crown is your own progress, redrawn. Neglect a province and it falls asleep — but it never takes anything back.',
+
+    packsH: 'Choose a Paket',
+    packsP: 'Each Paket is its own page. Your progress stays one story regardless of which door you go through.',
+
+    sideH: 'The side path',
+    sideP1: 'The main road is paved and everyone on it is in a hurry. But there is a gap in the hedge past the last milestone, and beyond it a rutted lane winds off between the fields.',
+    sideP2: 'No princess lives down there. Six girls work six farms, and between them they hold every rule of German grammar the way you hold a tool you use daily.',
+
+    badgesH: 'Badges',
+    badgesP: 'Everything you have carried home, from every road and every lane.',
+
+    footA: 'Saves to', footB: '· no external requests · no ads, ever',
+
+    keeping: 'You are keeping company with', province: 'Province',
+    waitFirst: 'she is waiting for your first word',
+    asleepWaiting: 'asleep — {n} words are waiting',
+    learnedOf: '{a} of {b} learned',
+    asleepDue: 'asleep · {n} due', notYet: 'not yet', masteredN: '{n} mastered',
+    stufen: ['Seed', 'Bud', 'Bloom', 'Crown'],
+
+    soon: 'soon', notBuilt: '~{n} words · not built yet',
+    openedToday: 'opened today', daysAgo: '{n} days ago', notStarted: 'not started yet',
+    resume: 'resume', start: 'start', packMeta: '{a} / {b} learned · {c} mastered',
+
+    agoToday: 'earlier today', agoYesterday: 'yesterday', agoDays: '{n} days ago',
+    lastTime: 'Last time, {ago}, you were in <b>{name}</b> — {a} of {b} words learned.',
+    continue: 'Continue →',
+
+    sideId: 'SIDE PATH', sideName: 'Der Feldweg · The Farm Lane',
+    sideCard: 'Six farmsteads, six working girls, {n} lessons of German grammar. No vocabulary, no separate score — the same streak, the same level.',
+    sideDue: '{n} due', sideOpen: 'open',
+    sideMeta: '{a} / {b} lessons mastered', closeness: 'closeness {n}%',
+
+    storeAccount: 'your Claude account (it follows you across devices)',
+    storeDevice: 'this browser only', storeMemory: 'this tab only — nothing will persist',
+    warn: '<b>Progress is not being saved.</b> This browser is blocking storage — usually private browsing, or an embedded frame. Open the page at its own address.',
+    welcome: 'Welcome to Wortwerk',
+    musicOn: 'Music on', musicOff: 'Music off', seOn: 'Sound effects on', seOff: 'Sound effects off',
+    musicHintOn: 'Turn music on', musicHintOff: 'Turn music off',
+    seHintOn: 'Turn effects on', seHintOff: 'Turn effects off',
+    musicFirstTap: 'Music starts on your first tap'
+  },
+  de: {
+    docTitle: 'Wortwerk — Übersicht',
+    level: 'Stufe', day: 'Tag', days: 'Tage', xpTo: 'XP → Stufe',
+    resumeEyebrow: 'Weiter geht\u2019s',
+
+    routeH: 'Route nach C2',
+    routeP: 'Sechs Wegmarken, einundzwanzigtausend Wörter, ein Reisender. Jedes Paket schreibt in dasselbe Konto — ein Level, eine Serie, eine Linie nach vorn.',
+    railEyebrow: 'Wörter gelernt, über alle Pakete',
+
+    reichH: 'Das Reich',
+    reichP: 'Sechs Provinzen an der Straße, jede mit einer Prinzessin, die mit ihrem Land wächst. Nichts hier kauft man mit Zeit: jedes Feld, jede Krone ist dein Fortschritt, neu gezeichnet. Wer eine Provinz vergisst, lässt sie schlafen — genommen wird nie etwas.',
+
+    packsH: 'Wähle ein Paket',
+    packsP: 'Jedes Paket ist eine eigene Seite. Dein Fortschritt bleibt eine gemeinsame Geschichte, durch welche Tür du auch gehst.',
+
+    sideH: 'Der Nebenpfad',
+    sideP1: 'Die Hauptstraße ist gepflastert, und alle darauf haben es eilig. Aber hinter dem letzten Meilenstein ist eine Lücke in der Hecke, und dahinter windet sich ein Feldweg zwischen die Äcker.',
+    sideP2: 'Dort unten wohnt keine Prinzessin. Sechs Mädchen bewirtschaften sechs Höfe, und zusammen halten sie jede Regel der deutschen Grammatik so in der Hand wie ein Werkzeug, das man täglich benutzt.',
+
+    badgesH: 'Abzeichen',
+    badgesP: 'Alles, was du heimgetragen hast — von jeder Straße und jedem Feldweg.',
+
+    footA: 'Speichert in', footB: '· keine externen Anfragen · keine Werbung, nie',
+
+    keeping: 'Du begleitest', province: 'Provinz',
+    waitFirst: 'sie wartet auf dein erstes Wort',
+    asleepWaiting: 'sie schläft — {n} Wörter warten',
+    learnedOf: '{a} von {b} gelernt',
+    asleepDue: 'schläft · {n} fällig', notYet: 'noch nicht', masteredN: '{n} gemeistert',
+    stufen: ['Saat', 'Knospe', 'Blüte', 'Krone'],
+
+    soon: 'bald', notBuilt: '~{n} Wörter · noch nicht gebaut',
+    openedToday: 'heute geöffnet', daysAgo: 'vor {n} Tagen', notStarted: 'noch nicht begonnen',
+    resume: 'weiter', start: 'start', packMeta: '{a} / {b} gelernt · {c} gemeistert',
+
+    agoToday: 'heute', agoYesterday: 'gestern', agoDays: 'vor {n} Tagen',
+    lastTime: 'Zuletzt {ago} in <b>{name}</b> — {a} von {b} Wörtern gelernt.',
+    continue: 'Weiter →',
+
+    sideId: 'NEBENPFAD', sideName: 'Der Feldweg',
+    sideCard: 'Sechs Höfe, sechs Mädchen, die arbeiten, {n} Lektionen deutscher Grammatik. Kein Wortschatz, kein eigener Punktestand — dieselbe Serie, dieselbe Stufe.',
+    sideDue: '{n} fällig', sideOpen: 'öffnen',
+    sideMeta: '{a} / {b} Lektionen gemeistert', closeness: 'Nähe {n}%',
+
+    storeAccount: 'deinem Claude-Konto (folgt dir über Geräte hinweg)',
+    storeDevice: 'nur diesem Browser', storeMemory: 'nur diesem Tab — nichts bleibt erhalten',
+    warn: '<b>Fortschritt wird nicht gespeichert.</b> Dieser Browser blockiert Speicherung — oft privates Surfen oder ein eingebetteter Frame. Öffne die Seite unter ihrer eigenen Adresse.',
+    welcome: 'Willkommen bei Wortwerk',
+    musicOn: 'Musik an', musicOff: 'Musik aus', seOn: 'Effekte an', seOff: 'Effekte aus',
+    musicHintOn: 'Musik an', musicHintOff: 'Musik aus',
+    seHintOn: 'Effekte an', seHintOff: 'Effekte aus',
+    musicFirstTap: 'Musik startet beim ersten Tippen'
+  }
+};
+function t(k, vars) {
+  let v = (T[LANG] && T[LANG][k] !== undefined) ? T[LANG][k] : T.en[k];
+  if (v === undefined) return k;
+  if (vars) Object.keys(vars).forEach(x => { v = v.split('{' + x + '}').join(vars[x]); });
+  return v;
+}
+function applyStatic() {
+  document.title = t('docTitle');
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-t]').forEach(el => { el.innerHTML = t(el.getAttribute('data-t')); });
+  const b = document.getElementById('langBtn');
+  if (b) b.textContent = LANG === 'en' ? 'DE' : 'EN';
+}
+async function setLang(l) {
+  LANG = l;
+  try { localStorage.setItem(K_LANG, JSON.stringify(l)); } catch (e) { }
+  try { if (window.storage) await window.storage.set(K_LANG, JSON.stringify(l)); } catch (e) { }
+  render();
+}
+
+
 const K_PACKS   = 'wortwerk:packs';
 
 const mem = {};
@@ -320,27 +471,44 @@ const RANKS = [
 ];
 
 const BADGE_META = {
-  start: { icon: '⚑', name: 'Anfang', desc: 'Finish one session' },
-  c100: { icon: '✦', name: 'Hundert', desc: '100 correct answers' },
-  c500: { icon: '▲', name: 'Fünfhundert', desc: '500 correct answers' },
-  c2000: { icon: '☰', name: 'Zweitausend', desc: '2 000 correct answers' },
-  s7: { icon: '☼', name: 'Sieben', desc: '7-day streak' },
-  s30: { icon: '⟲', name: 'Dreißig', desc: '30-day streak' },
-  k15: { icon: '⚡', name: 'Kombo', desc: '15 right in a row' },
-  w100: { icon: '◆', name: 'Hundert Wörter', desc: '100 words learned' },
-  w500: { icon: '◈', name: 'A2-Schwelle', desc: '500 words learned' }
+  start: { icon: '⚑', name: 'Anfang', nameEn: 'First step', desc: 'Eine Sitzung beenden', descEn: 'Finish one session' },
+  c100: { icon: '✦', name: 'Hundert', nameEn: 'Hundred', desc: '100 richtige Antworten', descEn: '100 correct answers' },
+  c500: { icon: '▲', name: 'Fünfhundert', nameEn: 'Five hundred', desc: '500 richtige Antworten', descEn: '500 correct answers' },
+  c2000: { icon: '☰', name: 'Zweitausend', nameEn: 'Two thousand', desc: '2 000 richtige Antworten', descEn: '2,000 correct answers' },
+  s7: { icon: '☼', name: 'Sieben', nameEn: 'Seven', desc: '7 Tage in Folge', descEn: '7-day streak' },
+  s30: { icon: '⟲', name: 'Dreißig', nameEn: 'Thirty', desc: '30 Tage in Folge', descEn: '30-day streak' },
+  k15: { icon: '⚡', name: 'Kombo', nameEn: 'Combo', desc: '15 richtig in Folge', descEn: '15 right in a row' },
+  w100: { icon: '◆', name: 'Hundert Wörter', nameEn: 'Hundred words', desc: '100 Wörter gelernt', descEn: '100 words learned' },
+  w500: { icon: '◈', name: 'A2-Schwelle', nameEn: 'A2 threshold', desc: '500 Wörter gelernt', descEn: '500 words learned' },
+  gstart: { icon: '🌾', name: 'Feldweg', nameEn: 'The Lane', desc: 'Eine Runde auf dem Feldweg', descEn: 'One round on the farm lane' },
+  g100: { icon: '✦', name: 'Hundert', nameEn: 'Hundred', desc: '100 Grammatikaufgaben richtig', descEn: '100 grammar answers right' },
+  g500: { icon: '▲', name: 'Fünfhundert', nameEn: 'Five hundred', desc: '500 Grammatikaufgaben richtig', descEn: '500 grammar answers right' },
+  ghof: { icon: '★', name: 'Ein Hof', nameEn: 'One farm', desc: 'Ein ganzer Hof gemeistert', descEn: 'One whole farmstead mastered' },
+  gall: { icon: '☰', name: 'Alle sechs', nameEn: 'All six', desc: 'Jede Lektion gemeistert', descEn: 'Every grammar lesson mastered' },
+  gfreund: { icon: '♥', name: 'Herzensfreundin', nameEn: 'Close friend', desc: 'Eine Freundschaft bei 90', descEn: 'A friendship at 90' },
+  gkombo: { icon: '⚡', name: 'Kombo', nameEn: 'Combo', desc: '20 richtig in Folge', descEn: '20 grammar answers in a row' }
 };
+function badgeName(m) { return (LANG === 'en' && m.nameEn) ? m.nameEn : m.name; }
+function badgeDesc(m) { return (LANG === 'en' && m.descEn) ? m.descEn : m.desc; }
 function badgeMeta(id) {
   if (BADGE_META[id]) return BADGE_META[id];
   const m = id.match(/^pack(\d+)$/);
-  if (m) return { icon: '★', name: 'Paket ' + m[1], desc: 'Every word in Paket ' + m[1] + ' mastered' };
+  if (m) return {
+    icon: '★', name: 'Paket ' + m[1], nameEn: 'Paket ' + m[1],
+    desc: 'Jedes Wort in Paket ' + m[1] + ' gemeistert', descEn: 'Every word in Paket ' + m[1] + ' mastered'
+  };
   return { icon: '●', name: id, desc: '' };
 }
 
 const MOTTOS = [
-  'Der Weg ist das Wort.', 'Kleine Schritte, große Wirkung.', 'Übung schmiedet Meister.',
-  'Ein Wort heute ist zehn morgen wert.', 'Der Zug fährt weiter.', 'Fleiß ist die beste Grammatik.',
-  'Wortschatz wächst leise.', 'Jeder Tag ein Ziegelstein.'
+  ['Der Weg ist das Wort.', 'The road is the word.'],
+  ['Kleine Schritte, große Wirkung.', 'Small steps, long shadows.'],
+  ['Übung schmiedet Meister.', 'Practice forges the master.'],
+  ['Ein Wort heute ist zehn morgen wert.', 'A word today is worth ten tomorrow.'],
+  ['Der Zug fährt weiter.', 'The train keeps going.'],
+  ['Fleiß ist die beste Grammatik.', 'Diligence is the best grammar.'],
+  ['Wortschatz wächst leise.', 'Vocabulary grows quietly.'],
+  ['Jeder Tag ein Ziegelstein.', 'Every day, one more brick.']
 ];
 
 const DAY = 86400000;
@@ -351,13 +519,15 @@ function toast(msg) { const t = document.getElementById('toast'); t.textContent 
 
 function paintHeader(S) {
   const lv = levelOf(S.xp || 0);
-  document.getElementById('chLevel').textContent = 'Stufe ' + lv.L;
+  document.getElementById('chLevel').textContent = t('level') + ' ' + lv.L;
   const rk = RANKS[Math.min(RANKS.length - 1, lv.L - 1)];
-  const rkEl = document.getElementById('chRank'); rkEl.textContent = rk[0]; rkEl.title = rk[1];
-  document.getElementById('chStreak').textContent = (S.streak || 0) + ((S.streak || 0) === 1 ? ' Tag' : ' Tage');
+  const rkEl = document.getElementById('chRank');
+  rkEl.textContent = LANG === 'en' ? rk[1] : rk[0];
+  rkEl.title = LANG === 'en' ? rk[0] : rk[1];
+  document.getElementById('chStreak').textContent = (S.streak || 0) + ' ' + ((S.streak || 0) === 1 ? t('day') : t('days'));
   document.getElementById('xpFill').style.width = (100 * lv.into / lv.need) + '%';
   document.getElementById('xpNow').textContent = (S.xp || 0) + ' XP';
-  document.getElementById('xpNext').textContent = (lv.need - lv.into) + ' XP → Stufe ' + (lv.L + 1);
+  document.getElementById('xpNext').textContent = (lv.need - lv.into) + ' ' + t('xpTo') + ' ' + (lv.L + 1);
 }
 
 function paintRail(learnedTotal) {
@@ -393,7 +563,7 @@ const PROVINZ = [
   { pack: 'p6', code: 'C2', land: 'Krone', col: '#CE3B2B', her: 'Friederike' }
 ];
 const SCHLAF = 40;
-const STUFE_NAME = ['Saat', 'Knospe', 'Blüte', 'Krone'];
+const stufeName = i => t('stufen')[i] || '';
 const E12 = '............';
 const STAGE = [
   [E12, E12, E12, E12, E12,
@@ -571,11 +741,11 @@ function paintReich(profile, packs) {
   const anyBuilt = PROVINZ.some(p => read(p).built);
   document.getElementById('hofLine').innerHTML =
     '<div class="hofher">' + spriteSVG(tst, tp.col, { px: 7, sleep: tsl, worn: kleid[tp.pack] || [] }) + '</div>' +
-    '<div class="hofinfo"><p class="eyebrow">Du begleitest</p><h3>' + tp.her + '</h3>' +
-    '<p class="muted">' + tp.code + ' · Provinz ' + tp.land + ' — ' +
-    (!anyBuilt ? 'sie wartet auf dein erstes Wort'
-      : tsl ? 'sie schläft, ' + ts.due + ' Wörter warten'
-        : STUFE_NAME[tst] + ' · ' + ts.learned + ' von ' + ts.total + ' gelernt') + '</p></div>' +
+    '<div class="hofinfo"><p class="eyebrow">' + t('keeping') + '</p><h3>' + tp.her + '</h3>' +
+    '<p class="muted">' + tp.code + ' · ' + t('province') + ' ' + tp.land + ' — ' +
+    (!anyBuilt ? t('waitFirst')
+      : tsl ? t('asleepWaiting', { n: ts.due })
+        : stufeName(tst) + ' · ' + t('learnedOf', { a: ts.learned, b: ts.total })) + '</p></div>' +
     '<div class="sternebig">✦ ' + (R.sterne || 0) + '</div>';
 
   /* the map */
@@ -590,9 +760,9 @@ function paintReich(profile, packs) {
     const inner =
       '<span class="ph"><i class="pdot" style="background:' + (st.built ? (sl ? '#9C9B93' : p.col) : '#C6C9C1') + '"></i>' +
       '<b>' + p.code + ' · ' + p.land + '</b></span>' +
-      '<span class="pn">' + (st.built ? (sl ? 'schläft · ' + st.due + ' fällig' : p.her + ' · ' + STUFE_NAME[stu]) : 'noch nicht') + '</span>' +
+      '<span class="pn">' + (st.built ? (sl ? t('asleepDue', { n: st.due }) : p.her + ' · ' + stufeName(stu)) : t('notYet')) + '</span>' +
       '<span class="pbar"><i style="width:' + pct + '%;background:' + (sl ? '#9C9B93' : p.col) + '"></i></span>' +
-      '<span class="pm">' + (st.built ? st.learned + ' / ' + st.total + ' · ' + st.mastered + ' gemeistert' : '&nbsp;') + '</span>' +
+      '<span class="pm">' + (st.built ? st.learned + ' / ' + st.total + ' · ' + t('masteredN', { n: st.mastered }) : '&nbsp;') + '</span>' +
       '<span class="pfoot">' + scene + '</span>' +
       (sl ? '<span class="hedge"></span>' : '');
     return (st.built && file)
@@ -622,18 +792,18 @@ function paintPacks(packs) {
     const pct = total ? Math.min(100, Math.round(100 * learned / total)) : 0;
 
     if (!built) {
-      return '<div class="packcard locked"><div class="pk-top"><span class="pk-id">Paket ' + r.order + '</span><span class="pk-cta soon">bald</span></div>' +
+      return '<div class="packcard locked"><div class="pk-top"><span class="pk-id">Paket ' + r.order + '</span><span class="pk-cta soon">' + t('soon') + '</span></div>' +
         '<p class="pk-name">' + esc(name) + '</p>' +
-        '<p class="tiny" style="margin:0">~' + total.toLocaleString() + ' Wörter · noch nicht gebaut</p></div>';
+        '<p class="tiny" style="margin:0">' + t('notBuilt', { n: total.toLocaleString(LANG === 'de' ? 'de-DE' : 'en-GB') }) + '</p></div>';
     }
     const metaRight = p && p.at != null
-      ? (today() - p.at === 0 ? 'heute geöffnet' : 'vor ' + (today() - p.at) + ' Tagen')
-      : 'noch nicht begonnen';
+      ? (today() - p.at === 0 ? t('openedToday') : t('daysAgo', { n: today() - p.at }))
+      : t('notStarted');
     return '<a class="packcard live" href="' + r.file + '"><div class="pk-top"><span class="pk-id">Paket ' + r.order + '</span>' +
-      '<span class="pk-cta">' + (learned > 0 ? 'weiter' : 'start') + '</span></div>' +
+      '<span class="pk-cta">' + (learned > 0 ? t('resume') : t('start')) + '</span></div>' +
       '<p class="pk-name">' + esc(name) + '</p>' +
       '<div class="pk-bar"><i style="width:' + pct + '%"></i></div>' +
-      '<div class="pk-meta"><span>' + learned + ' / ' + total + ' gelernt · ' + mastered + ' mastered</span><span>' + metaRight + '</span></div></a>';
+      '<div class="pk-meta"><span>' + t('packMeta', { a: learned, b: total, c: mastered }) + '</span><span>' + metaRight + '</span></div></a>';
   }).join('');
 }
 
@@ -642,7 +812,7 @@ function paintBadges(earned) {
   const ids = Array.from(new Set([...Object.keys(BADGE_META), ...ROUTE.map(r => 'pack' + r.id.replace(/\D/g, '')), ...got]));
   document.getElementById('badgeGrid').innerHTML = ids.map(id => {
     const m = badgeMeta(id), on = got.has(id);
-    return '<div class="badge ' + (on ? 'got' : '') + '"><em>' + m.icon + '</em><b>' + esc(m.name) + '</b><s>' + esc(m.desc) + '</s></div>';
+    return '<div class="badge ' + (on ? 'got' : '') + '"><em>' + m.icon + '</em><b>' + esc(badgeName(m)) + '</b><s>' + esc(badgeDesc(m)) + '</s></div>';
   }).join('');
 }
 
@@ -653,12 +823,13 @@ function paintResume(packs) {
   const top = ids[0], p = packs[top];
   const route = ROUTE.find(r => r.id === top);
   const file = route ? route.file : 'paket' + top.replace(/\D/g, '') + '.html';
-  const ago = today() - p.at === 0 ? 'heute' : today() - p.at === 1 ? 'gestern' : 'vor ' + (today() - p.at) + ' Tagen';
+  const d = today() - p.at;
+  const ago = d === 0 ? t('agoToday') : d === 1 ? t('agoYesterday') : t('agoDays', { n: d });
   const el = document.getElementById('resume');
   el.classList.remove('hide');
   document.getElementById('resumeTxt').innerHTML =
-    'Zuletzt ' + ago + ' in <b>' + esc(p.name || top) + '</b> — ' + (p.learned || 0) + ' von ' + (p.total || '?') + ' Wörtern gelernt.' +
-    '<br><a class="btn" style="margin-top:9px" href="' + file + '">Weiter →</a>';
+    t('lastTime', { ago: ago, name: esc(p.name || top), a: p.learned || 0, b: p.total || '?' }) +
+    '<br><a class="btn" style="margin-top:9px" href="' + file + '">' + t('continue') + '</a>';
 }
 
 
@@ -831,16 +1002,16 @@ const KLANG = (() => {
 
   function paint() {
     const m = document.getElementById('sbBgm'), s = document.getElementById('sbSe');
-    if (m) { m.setAttribute('aria-pressed', !!pref.bgm); m.title = pref.bgm ? 'Musik aus' : 'Musik an'; }
-    if (s) { s.setAttribute('aria-pressed', !!pref.se); s.title = pref.se ? 'Effekte aus' : 'Effekte an'; }
+    if (m) { m.setAttribute('aria-pressed', !!pref.bgm); m.title = pref.bgm ? t('musicHintOff') : t('musicHintOn'); }
+    if (s) { s.setAttribute('aria-pressed', !!pref.se); s.title = pref.se ? t('seHintOff') : t('seHintOn'); }
   }
   function say(msg) { try { if (typeof toast === 'function') toast(msg); } catch (e) { } }
 
   function toggle(what) {
     pref[what] = !pref[what];
     store(); paint();
-    if (what === 'bgm') { apply(); say(pref.bgm ? 'Musik an' : 'Musik aus'); }
-    else { if (pref.se) se('right'); say(pref.se ? 'Effekte an' : 'Effekte aus'); }
+    if (what === 'bgm') { apply(); say(pref.bgm ? t('musicOn') : t('musicOff')); }
+    else { if (pref.se) se('right'); say(pref.se ? t('seOn') : t('seOff')); }
   }
 
   function wire() {
@@ -865,7 +1036,7 @@ const KLANG = (() => {
     if (pref.bgm) {
       apply();
       setTimeout(() => {
-        if (!told && (!ctx || ctx.state !== 'running')) { told = true; say('Musik startet beim ersten Tippen'); }
+        if (!told && (!ctx || ctx.state !== 'running')) { told = true; say(t('musicFirstTap')); }
       }, 900);
     }
   }
@@ -912,30 +1083,98 @@ const NAV = (() => {
   return { wire, leave, enter };
 })();
 
-async function boot() {
-  KLANG.wire(); NAV.wire();
-  const profile = await STORE.get(K_PROFILE) || {};
-  const packs = await STORE.get(K_PACKS) || {};
 
-  document.getElementById('motto').textContent = MOTTOS[today() % MOTTOS.length];
+/* ============================================================
+   THE SIDE PATH — Der Feldweg, seen from the hub.
+   Its own scheduler key, so nothing here touches the packs; the
+   hub only reads it and points the way.
+   ============================================================ */
+const FELDWEG = [
+  { id: 'kasus', name: 'Die Artikelweide', en: 'The Article Pasture', girl: 'Liesl', role: 'goose girl', col: '#6A4CE0', n: 9 },
+  { id: 'verb', name: 'Der Verbenacker', en: 'The Verb Field', girl: 'Grete', role: 'ploughwoman', col: '#1F9E63', n: 14 },
+  { id: 'adj', name: 'Der Adjektivgarten', en: 'The Adjective Garden', girl: 'Marlene', role: 'gardener', col: '#E8A200', n: 6 },
+  { id: 'prep', name: 'Der Präpositionsteich', en: 'The Preposition Pond', girl: 'Bärbel', role: 'fisherwoman', col: '#29A3E0', n: 6 },
+  { id: 'satz', name: 'Die Satzbaumühle', en: 'The Sentence Mill', girl: 'Sanne', role: 'miller', col: '#0A5FCE', n: 10 },
+  { id: 'pron', name: 'Die Pronomenscheune', en: 'The Pronoun Barn', girl: 'Ida', role: 'barn keeper', col: '#CE3B2B', n: 6 }
+];
+const FELD_N = FELDWEG.reduce((n, h) => n + h.n, 0);
 
-  paintHeader(profile);
+function paintFeldweg(gram) {
+  const L = (gram && gram.l) || {};
+  const el = document.getElementById('feldweg');
+  let mastAll = 0, dueAll = 0;
+  const rows = FELDWEG.map(h => {
+    let hi = 0, right = 0, mast = 0, due = 0;
+    Object.keys(L).forEach(k => {
+      if (k.indexOf(h.id + '.') !== 0) return;
+      const r = L[k];
+      hi += (r[6] || 0); right += (r[5] || 0);
+      if (r[0] >= 7) mast++;
+      if (r[4] > 0 && r[1] <= today()) due++;
+    });
+    mastAll += mast; dueAll += due;
+    const naehe = Math.max(0, Math.min(100, Math.round(100 * (0.55 * hi / (9 * h.n) + 0.45 * Math.min(1, right / (h.n * 26))))));
+    return { h: h, naehe: naehe, mast: mast, due: due };
+  });
+  const pct = Math.round(100 * mastAll / FELD_N);
+  el.innerHTML =
+    '<a class="packcard live" href="grammatik.html" style="border-left-color:var(--gruen)">' +
+    '<div class="pk-top"><span class="pk-id">' + t('sideId') + '</span><span class="pk-cta">' +
+    (dueAll ? t('sideDue', { n: dueAll }) : t('sideOpen')) + '</span></div>' +
+    '<p class="pk-name">' + t('sideName') + '</p>' +
+    '<p class="muted" style="margin:0 0 4px;font-size:13.5px">' + t('sideCard', { n: FELD_N }) + '</p>' +
+    '<div class="pk-bar"><i style="width:' + pct + '%;background:var(--gruen)"></i></div>' +
+    '<div class="pk-meta"><span>' + t('sideMeta', { a: mastAll, b: FELD_N }) + '</span><span>' + pct + '%</span></div>' +
+    '</a>' +
+    '<div class="karte" style="margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(172px,1fr))">' +
+    rows.map(function (r) {
+      return '<a class="prov" href="grammatik.html"><div class="ph"><span class="pdot" style="background:' + r.h.col + '"></span>' +
+        '<b>' + r.h.girl + '</b></div>' +
+        '<span class="pn">' + (LANG === 'en' ? r.h.en : r.h.name) + '</span>' +
+        '<span class="pbar"><i style="width:' + r.naehe + '%;background:' + r.h.col + '"></i></span>' +
+        '<span class="pm">' + t('closeness', { n: r.naehe }) + ' · ' + r.mast + '/' + r.h.n + (r.due ? ' · ' + t('sideDue', { n: r.due }) : '') + '</span></a>';
+    }).join('') +
+    '</div>';
+}
+
+let DATA = { profile: {}, packs: {}, gram: {} };
+
+function render() {
+  applyStatic();
+  const packs = DATA.packs;
+  document.getElementById('motto').textContent = MOTTOS[today() % MOTTOS.length][LANG === 'en' ? 1 : 0];
+  paintHeader(DATA.profile);
   paintResume(packs);
-
-  const learnedTotal = Object.values(packs).reduce((n, p) => n + (p.learned || 0), 0);
-  paintRail(learnedTotal);
-  paintReich(profile, packs);
+  paintRail(Object.values(packs).reduce((n, p) => n + (p.learned || 0), 0));
+  paintReich(DATA.profile, packs);
   paintPacks(packs);
-  paintBadges(profile.badges);
-
-  const modeTxt = { account: 'deinem Claude-Konto (folgt dir über Geräte hinweg)', device: 'diesem Browser', memory: 'nur diesem Tab — nichts bleibt erhalten' };
+  paintFeldweg(DATA.gram);
+  paintBadges(DATA.profile.badges);
+  const modeTxt = { account: t('storeAccount'), device: t('storeDevice'), memory: t('storeMemory') };
   document.getElementById('storeMode').textContent = modeTxt[STORE_MODE] || modeTxt.device;
   const warn = document.getElementById('storeWarn');
-  if (STORE_MODE === 'memory') {
-    warn.classList.remove('hide');
-    warn.innerHTML = '<b>Fortschritt wird nicht gespeichert.</b> Dieser Browser blockiert Speicherung — oft privates Surfen oder ein eingebetteter Frame. Öffne die Seite unter ihrer eigenen Adresse.';
-  }
-  if (!Object.keys(packs).length) toast('Willkommen bei Wortwerk');
+  warn.classList.toggle('hide', STORE_MODE !== 'memory');
+  if (STORE_MODE === 'memory') warn.innerHTML = t('warn');
+}
+
+async function boot() {
+  const saved = await STORE.get(K_LANG);
+  if (saved === 'de' || saved === 'en') LANG = saved;
+
+  KLANG.wire(); NAV.wire();
+  DATA.profile = await STORE.get(K_PROFILE) || {};
+  DATA.packs = await STORE.get(K_PACKS) || {};
+  DATA.gram = await STORE.get(K_GRAM) || {};
+
+  const b = document.getElementById('langBtn');
+  if (b) b.onclick = () => setLang(LANG === 'en' ? 'de' : 'en');
+
+  render();
+  setInterval(() => {
+    const modeTxt = { account: t('storeAccount'), device: t('storeDevice'), memory: t('storeMemory') };
+    document.getElementById('storeMode').textContent = modeTxt[STORE_MODE] || modeTxt.device;
+  }, 2000);
+  if (!Object.keys(DATA.packs).length) toast(t('welcome'));
 }
 boot();
 </script>
