@@ -166,6 +166,52 @@ body{overflow-x:clip}
 :focus-visible{outline:3px solid var(--blau);outline-offset:2px}
 @media(max-width:560px){.packgrid{grid-template-columns:1fr}}
 @media(min-width:561px){.packgrid{grid-template-columns:1fr 1fr}}
+/* ============ REICH ============ */
+.sprite{image-rendering:pixelated;display:block}
+.hofline{display:flex;align-items:center;gap:18px;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;margin-bottom:14px}
+.hofline .hofher{flex:none}
+.hofline .hofinfo{flex:1;min-width:0}
+.hofline .hofinfo h3{font-family:var(--disp);font-size:26px;margin:0 0 1px;line-height:1}
+.hofline .hofinfo p{margin:0}
+.sternebig{font-family:var(--mono);font-size:16px;color:var(--gelb);white-space:nowrap}
+@media(max-width:520px){
+  .hofline{flex-wrap:wrap;gap:12px}
+  .hofline .hofinfo{flex:1 1 60%}
+  .sternebig{flex:1 1 100%;text-align:right}
+}
+.karte{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));
+  background:var(--paper-2);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:28px 28px;background-position:-1px -1px;
+  border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.prov{position:relative;overflow:hidden;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:6px;padding:11px 12px 8px;
+  display:flex;flex-direction:column;gap:6px;transition:transform .18s,border-color .18s}
+a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
+.prov.locked{background:transparent;border-style:dashed}
+.prov.locked .pn{color:var(--ink-40)}
+.prov.asleep{background:#EDEDE8}
+.prov .ph{display:flex;align-items:center;gap:7px}
+.prov .ph b{font-family:var(--disp);font-size:17px;letter-spacing:.01em}
+.prov .pdot{width:9px;height:9px;border-radius:2px;flex:none}
+.prov .pn{font-size:11.5px;color:var(--ink-60);font-family:var(--mono)}
+.prov .pbar{display:block;height:6px;background:var(--paper-2);border-radius:3px;overflow:hidden}
+.prov .pbar i{display:block;height:100%;border-radius:3px}
+.prov .pm{font-family:var(--mono);font-size:10.5px;color:var(--ink-40)}
+.pfoot{display:block;margin-top:2px}
+.scene{display:block;width:100%;image-rendering:pixelated}
+.hedge{position:absolute;left:0;right:0;bottom:0;height:5px;opacity:.45;
+  background:repeating-linear-gradient(90deg,var(--rot) 0 3px,transparent 3px 8px)}
+@media(prefers-reduced-motion:reduce){a.prov:hover{transform:none}}
+@media(min-width:820px){
+  .prov:nth-child(2){transform:translateY(12px)}
+  .prov:nth-child(3){transform:translateY(-6px)}
+  .prov:nth-child(5){transform:translateY(10px)}
+  a.prov:nth-child(2):hover{transform:translateY(10px)}
+  a.prov:nth-child(3):hover{transform:translateY(-8px)}
+  a.prov:nth-child(5):hover{transform:translateY(8px)}
+}
 </style>
 </head>
 <body>
@@ -198,6 +244,13 @@ body{overflow-x:clip}
     <p class="eyebrow">Wörter gelernt, über alle Pakete</p>
     <div class="rail" id="rail"></div>
   </div>
+</section>
+
+<section>
+  <h2 class="sec">Das Reich</h2>
+  <p class="muted">Sechs Provinzen, eine Straße. Alles hier ist dein Fortschritt, neu gezeichnet — nichts davon kauft man mit Zeit.</p>
+  <div class="hofline" id="hofLine"></div>
+  <div class="karte" id="reichKarte"></div>
 </section>
 
 <section>
@@ -319,6 +372,233 @@ function paintRail(learnedTotal) {
       return '<div class="stn ' + (on ? 'on' : '') + ' ' + (here ? 'here' : '') + '" style="left:' + p + '%"><b>' + n + '</b><div class="dot"></div><s>' + v.toLocaleString() + '</s></div>';
     }).join('') +
     '<div class="train" style="left:' + done + '%">▲ ' + learnedTotal + '</div>';
+}
+
+/* ============================================================
+   REICH — the whole realm, seen from the hub.
+
+   This page has no lexicon and no scheduler, so it draws only
+   what every pack publishes into the shared registry: how much
+   is learned, how much is mastered, and how much is overdue.
+   Same sleep rule, same figures, same palette as inside a pack.
+   Purchases live where the princess lives; here you only look,
+   and travel.
+   ============================================================ */
+const PROVINZ = [
+  { pack: 'p1', code: 'A1', land: 'Wurzel', col: '#6A4CE0', her: 'Adelheid' },
+  { pack: 'p2', code: 'A2', land: 'Markt', col: '#0A5FCE', her: 'Berenike' },
+  { pack: 'p3', code: 'B1', land: 'Fluss', col: '#1F9E63', her: 'Cordula' },
+  { pack: 'p4', code: 'B2', land: 'Hügel', col: '#29A3E0', her: 'Dorothea' },
+  { pack: 'p5', code: 'C1', land: 'Turm', col: '#E8A200', her: 'Elisabeth' },
+  { pack: 'p6', code: 'C2', land: 'Krone', col: '#CE3B2B', her: 'Friederike' }
+];
+const SCHLAF = 40;
+const STUFE_NAME = ['Saat', 'Knospe', 'Blüte', 'Krone'];
+const E12 = '............';
+const STAGE = [
+  [E12, E12, E12, E12, E12,
+    '..hhhhhhhh..', '..hssssssh..', '..hskssksh..', '..hbssssbh..', '...ssssss...',
+    '....pppp....', '...pppppp...', '...pppppp...', '..pppppppp..', '..pppppppp..', '.pppppppppp.'],
+  [E12, E12, E12,
+    '..hhhhhhhh..', '..hssssssh..', '..hskssksh..', '..hbssssbh..', '...ssssss...', '....ssss....',
+    '..gggggggg..', '..gddddddg..', '..dddddddd..', '.dddddddddd.', '.dwwwwwwwwd.', '.dddddddddd.', 'dddddddddddd'],
+  [E12,
+    '....g.g.....', '...gggggg...', '..hhhhhhhh..', '..hssssssh..', '..hskssksh..', '..hbssssbh..', '...ssssss...', '....ssss....',
+    '..gggggggg..', '..gddddddg..', '..dddddddd..', '.dwwwwwwwwd.', '.dddddddddd.', 'dwwwwwwwwwwd', 'dddddddddddd'],
+  ['...g.g.g....', '...gggggg...', '..hhhhhhhh..', '..hssssssh..', '..hskssksh..', '..hbssssbh..', '...ssssss...', '....ssss....',
+    '..gggggggg..', '..gddddddg..', '..dddddddd..', '.dwwwwwwwwd.', '.dddddddddd.', 'dwwwwwwwwwwd', 'dddddddddddd', 'dggggggggggd']
+];
+const KLEIDER = [
+  { id: 'zopf', px: [[1, 4], [10, 4], [1, 5], [10, 5], [1, 6], [10, 6], [1, 7], [10, 7]], c: '#16181D' },
+  { id: 'kranz', px: [[3, 1, '#E9A8A0'], [4, 1, '#1F9E63'], [5, 1, '#CE3B2B'], [6, 1, '#1F9E63'], [7, 1, '#E9A8A0'], [8, 1, '#1F9E63']] },
+  { id: 'laterne', px: [[0, 9, '#16181D'], [0, 10, '#E8A200'], [1, 10, '#E8A200'], [0, 11, '#E8A200'], [1, 11, '#E8A200'], [0, 12, '#16181D'], [1, 12, '#16181D']] },
+  { id: 'umhang', cloak: true }
+];
+const LAND_SP = {
+  baum: ['..g..', '.ggg.', 'ggggg', '.ggg.', '..t..'],
+  teich: ['.www.', 'wwwww', 'wwwww', '.www.', '.....'],
+  weg: ['.....', 'ss.ss', '.sss.', 'ss.ss', '.....'],
+  zaun: ['.r.r.', 'sssss', '.s.s.', 'sssss', '.s.s.']
+};
+const LAND_PAL = { g: '#1F9E63', t: '#8A5A3B', w: '#29A3E0', s: '#C6C9C1', r: '#CE3B2B' };
+
+function tint(hex, amt) {
+  const p = [231, 232, 227];
+  const c = [1, 3, 5].map(i => parseInt(hex.substr(i, 2), 16));
+  return '#' + c.map((v, i) => Math.round(v + (p[i] - v) * amt).toString(16).padStart(2, '0')).join('');
+}
+/* ---------- expressions ----------
+   The head sits at a different row in each growth stage, so the face is
+   painted by row offset rather than baked into the stage maps. Six pixels
+   of eye and mouth is the whole emotional range, and that is enough. */
+const EYE_ROW = [7, 5, 5, 4];
+const GESICHT = {
+  ruhe: { e: [4, 7], m: [[3, 'b'], [8, 'b']] },
+  laecheln: { e: [4, 7], m: [[3, 'b'], [8, 'b'], [5, 'k'], [6, 'k']] },
+  freude: { e: [3, 4, 7, 8], m: [[3, 'b'], [8, 'b'], [5, 'k'], [6, 'k']] },
+  staunen: { e: [4, 7], m: [[5, 'k'], [6, 'k']] },
+  schlaf: { e: [3, 4, 5, 6, 7, 8], m: [] }
+};
+
+/* ---------- landscape motifs ---------- */
+const MOT = {
+  weg: ['sss', '.s.', 'sss'],
+  blume: ['.r.', '.g.', '.g.'],
+  baum: ['..g..', '.ggg.', 'ggggg', '.ggg.', '..t..', '..t..'],
+  obst: ['..g..', '.grg.', 'ggggg', '.rgg.', '..t..', '..t..'],
+  haus: ['..ccc..', '.ccccc.', 'ccccccc', '.nnnnn.', '.n.d.n.', '.nndnn.'],
+  turm: ['..f..', '.bbb.', 'bbbbb', 'b.y.b', 'bbbbb', 'bbbbb', 'b.y.b', 'bbbbb', 'bbbbb'],
+  teich: ['.www.', 'wwwww', '.www.'],
+  zaun: ['.r.r.', 'sssss', '.s.s.']
+};
+const MOT_PAL = {
+  g: '#1F9E63', t: '#8A5A3B', w: '#29A3E0', s: '#C6C9C1', r: '#CE3B2B',
+  c: '#CE3B2B', d: '#8A5A3B', n: '#F5F6F2', y: '#E8A200', f: '#E8A200', b: '#8A8F96'
+};
+
+function figureGrid(stufe, col, o) {
+  o = o || {};
+  const sleep = !!o.sleep, worn = o.worn || [];
+  const ix = Math.max(0, Math.min(3, stufe | 0)), rows = STAGE[ix];
+  const dress = sleep ? '#9C9B93' : col;
+  const pale = sleep ? '#CBCAC2' : tint(col, 0.5);
+  const gold = sleep ? '#B4B2A9' : '#E8A200';
+  const pal = { '.': null, k: '#16181D', s: '#F5F6F2', h: '#16181D', d: dress, p: pale, g: gold, w: '#E7E8E3', b: sleep ? '#C9BDBA' : '#E9A8A0' };
+  const grid = {};
+  for (let y = 0; y < rows.length; y++) for (let x = 0; x < 12; x++) {
+    const c = pal[rows[y].charAt(x)]; if (c) grid[x + ',' + y] = c;
+  }
+  const er = EYE_ROW[ix], face = GESICHT[o.face || (sleep ? 'schlaf' : 'ruhe')] || GESICHT.ruhe;
+  for (let x = 3; x <= 8; x++) { grid[x + ',' + er] = pal.s; grid[x + ',' + (er + 1)] = pal.s; }
+  face.e.forEach(x => { grid[x + ',' + er] = pal.k; });
+  face.m.forEach(m => { grid[m[0] + ',' + (er + 1)] = m[1] === 'b' ? pal.b : pal.k; });
+  worn.forEach(id => {
+    const it = KLEIDER.find(k => k.id === id); if (!it) return;
+    if (it.cloak) {
+      const deep = sleep ? '#8E8D86' : tint(col, -0.28);
+      for (let y = 8; y < rows.length; y++) [0, 1, 10, 11].forEach(x => { if (grid[x + ',' + y] || y > 10) grid[x + ',' + y] = deep; });
+    } else it.px.forEach(p => { grid[p[0] + ',' + p[1]] = sleep ? '#B4B2A9' : (p[2] || it.c); });
+  });
+  return { grid: grid, h: rows.length };
+}
+
+function spriteSVG(stufe, col, o) {
+  o = o || {};
+  const px = o.px || 4, f = figureGrid(stufe, col, o);
+  let out = '<svg class="sprite" width="' + (12 * px) + '" height="' + (f.h * px) +
+    '" viewBox="0 0 12 ' + f.h + '" shape-rendering="crispEdges" aria-hidden="true">';
+  Object.keys(f.grid).forEach(k => { const xy = k.split(','); out += '<rect x="' + xy[0] + '" y="' + xy[1] + '" width="1" height="1" fill="' + f.grid[k] + '"/>'; });
+  return out + '</svg>';
+}
+
+/* ---------- the province landscape ----------
+   Nothing here is placed by hand and nothing is random: each motif has a
+   threshold, so the same progress always builds the same country. It is a
+   progress bar that happens to look like somewhere you could live. */
+function sceneSVG(col, o) {
+  o = o || {};
+  const fl = o.fl || 0, fm = o.fm || 0, sleep = !!o.sleep, extra = o.extra || [];
+  const W = 78, H = 22, GY = 20;
+  const items = [];
+  if (fl > 0) items.push('weg');
+  if (fl >= 0.02) items.push('blume');
+  if (fl >= 0.05) items.push('haus');
+  if (fl >= 0.10) items.push(fm >= 0.08 ? 'obst' : 'baum');
+  if (fl >= 0.18) items.push('teich');
+  if (fl >= 0.25) items.push('turm');
+  if (fl >= 0.35) items.push(fm >= 0.15 ? 'obst' : 'baum');
+  if (fl >= 0.50) items.push('zaun');
+  extra.forEach(id => { if (MOT[id]) items.push(id); });
+
+  const dull = c => sleep ? '#B4B2A9' : c;
+  let out = '<svg class="scene" viewBox="0 0 ' + W + ' ' + H + '" width="100%" ' +
+    'preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges" aria-hidden="true">';
+  const gamt = Math.max(0, 0.78 - Math.min(0.78, fl * 1.6));
+  out += '<rect x="0" y="' + GY + '" width="' + W + '" height="1" fill="' + (sleep ? '#C4C3BA' : tint('#1F9E63', gamt)) + '"/>';
+  if (!sleep && fm >= 0.30) out += '<rect x="70" y="1" width="3" height="3" fill="#E8A200"/>';
+
+  items.slice(0, 7).forEach((id, i) => {
+    const m = MOT[id]; if (!m) return;
+    const w = m[0].length, h = m.length, x0 = 1 + i * 8, y0 = GY - h;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const c = MOT_PAL[m[y].charAt(x)];
+      if (c) out += '<rect x="' + (x0 + x) + '" y="' + (y0 + y) + '" width="1" height="1" fill="' + dull(c) + '"/>';
+    }
+  });
+  if (!o.leer) {
+    const f = figureGrid(o.stufe || 0, col, { sleep: sleep, worn: o.worn, face: o.face });
+    const fx = W - 14, fy = GY - f.h;
+    Object.keys(f.grid).forEach(k => {
+      const xy = k.split(',');
+      out += '<rect x="' + (fx + (+xy[0])) + '" y="' + (fy + (+xy[1])) + '" width="1" height="1" fill="' + f.grid[k] + '"/>';
+    });
+  }
+  return out + '</svg>';
+}
+
+function landSVG(id, px) {
+  const m = LAND_SP[id]; if (!m) return '';
+  let out = '<svg width="' + (5 * px) + '" height="' + (5 * px) + '" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true">';
+  for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) {
+    const c = LAND_PAL[m[y].charAt(x)];
+    if (c) out += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + c + '"/>';
+  }
+  return out + '</svg>';
+}
+function stufeOf(learned, total) {
+  if (!total) return 0;
+  const f = learned / total;
+  return f >= 0.40 ? 3 : f >= 0.15 ? 2 : f >= 0.03 ? 1 : 0;
+}
+
+function paintReich(profile, packs) {
+  const R = (profile && profile.reich) || {};
+  const kleid = R.kleid || {}, land = R.land || {};
+  const fileOf = id => (ROUTE.find(r => r.id === id) || {}).file;
+
+  const read = p => {
+    const rec = packs[p.pack];
+    if (!rec) return { built: false, learned: 0, total: 0, mastered: 0, due: 0 };
+    return {
+      built: true, learned: rec.learned || 0, total: rec.total || 0,
+      mastered: rec.mastered || 0, due: rec.due || 0, at: rec.at
+    };
+  };
+
+  /* the court line — whoever you are currently keeping company */
+  const tp = PROVINZ.find(p => p.pack === (R.tend || 'p1')) || PROVINZ[0];
+  const ts = read(tp), tsl = ts.due >= SCHLAF, tst = stufeOf(ts.learned, ts.total);
+  const anyBuilt = PROVINZ.some(p => read(p).built);
+  document.getElementById('hofLine').innerHTML =
+    '<div class="hofher">' + spriteSVG(tst, tp.col, { px: 7, sleep: tsl, worn: kleid[tp.pack] || [] }) + '</div>' +
+    '<div class="hofinfo"><p class="eyebrow">Du begleitest</p><h3>' + tp.her + '</h3>' +
+    '<p class="muted">' + tp.code + ' · Provinz ' + tp.land + ' — ' +
+    (!anyBuilt ? 'sie wartet auf dein erstes Wort'
+      : tsl ? 'sie schläft, ' + ts.due + ' Wörter warten'
+        : STUFE_NAME[tst] + ' · ' + ts.learned + ' von ' + ts.total + ' gelernt') + '</p></div>' +
+    '<div class="sternebig">✦ ' + (R.sterne || 0) + '</div>';
+
+  /* the map */
+  document.getElementById('reichKarte').innerHTML = PROVINZ.map(p => {
+    const st = read(p), sl = st.built && st.due >= SCHLAF, stu = stufeOf(st.learned, st.total);
+    const pct = st.total ? Math.min(100, Math.round(100 * st.learned / st.total)) : 0;
+    const file = fileOf(p.pack);
+    const scene = st.built ? sceneSVG(p.col, {
+      fl: st.total ? st.learned / st.total : 0, fm: st.total ? st.mastered / st.total : 0,
+      sleep: sl, stufe: stu, worn: kleid[p.pack] || [], extra: land[p.pack] || []
+    }) : sceneSVG(p.col, { fl: 0, fm: 0, leer: true });
+    const inner =
+      '<span class="ph"><i class="pdot" style="background:' + (st.built ? (sl ? '#9C9B93' : p.col) : '#C6C9C1') + '"></i>' +
+      '<b>' + p.code + ' · ' + p.land + '</b></span>' +
+      '<span class="pn">' + (st.built ? (sl ? 'schläft · ' + st.due + ' fällig' : p.her + ' · ' + STUFE_NAME[stu]) : 'noch nicht') + '</span>' +
+      '<span class="pbar"><i style="width:' + pct + '%;background:' + (sl ? '#9C9B93' : p.col) + '"></i></span>' +
+      '<span class="pm">' + (st.built ? st.learned + ' / ' + st.total + ' · ' + st.mastered + ' gemeistert' : '&nbsp;') + '</span>' +
+      '<span class="pfoot">' + scene + '</span>' +
+      (sl ? '<span class="hedge"></span>' : '');
+    return (st.built && file)
+      ? '<a class="prov' + (sl ? ' asleep' : '') + '" href="' + file + '">' + inner + '</a>'
+      : '<div class="prov locked">' + inner + '</div>';
+  }).join('');
 }
 
 function paintPacks(packs) {
@@ -644,6 +924,7 @@ async function boot() {
 
   const learnedTotal = Object.values(packs).reduce((n, p) => n + (p.learned || 0), 0);
   paintRail(learnedTotal);
+  paintReich(profile, packs);
   paintPacks(packs);
   paintBadges(profile.badges);
 

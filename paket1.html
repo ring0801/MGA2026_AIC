@@ -163,9 +163,11 @@ button.shaky:active{background:rgba(106,76,224,.14)}
 .wotd{background:var(--violett);color:#fff;border-radius:var(--r);padding:14px;margin-bottom:14px;cursor:pointer;position:relative;overflow:hidden}
 .wotd .eyebrow{color:rgba(255,255,255,.6)}
 .wotd h4{font-family:var(--disp);font-size:clamp(24px,7vw,38px);font-weight:700;margin:0;line-height:1;letter-spacing:.01em;word-break:break-word}
-.wotd .lit{font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.75);margin-top:7px;letter-spacing:.02em}
+.wotd .lit{font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.75);margin-top:7px;letter-spacing:.02em;padding-right:52px}
 .wotd .mean{font-size:14.5px;margin-top:7px;max-height:0;overflow:hidden;opacity:0;transition:.3s}
-.wotd.open .mean{max-height:120px;opacity:1;margin-top:9px}
+.wotd.open .mean{max-height:none;opacity:1;margin-top:9px}
+.wotd.open{padding-bottom:36px}
+.wotd .flip{white-space:nowrap}
 .wotd .flip{position:absolute;right:12px;bottom:10px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:rgba(255,255,255,.55)}
 .rank{font-family:var(--disp);font-size:15px;letter-spacing:.05em;text-transform:uppercase;color:var(--gelb)}
 .combo{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--gelb);font-weight:600}
@@ -285,12 +287,122 @@ body{overflow-x:clip}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 :focus-visible{outline:3px solid var(--blau);outline-offset:2px}
 @media(max-width:420px){.prompt{font-size:36px}.grid4{grid-template-columns:repeat(2,1fr)}}
+/* ============ REICH ============ */
+.sprite{image-rendering:pixelated;display:block}
+
+/* the Heute strip */
+.strip{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:10px 14px;margin-bottom:16px;cursor:pointer;font:inherit;color:inherit}
+.strip:hover{border-color:var(--ink-40)}
+.strip .stript{display:flex;flex-direction:column;line-height:1.25;flex:1;min-width:0}
+.strip .stript b{font-family:var(--disp);font-size:18px;letter-spacing:.01em}
+.strip .stript .muted{font-size:12px}
+.strip .sterne{font-family:var(--mono);font-size:13px;color:var(--gelb);white-space:nowrap}
+
+/* header companion */
+#hofMini{display:flex;align-items:center;margin-left:10px}
+@media(max-width:420px){#hofMini{display:none}}
+
+/* the court */
+.hof{display:flex;gap:22px;align-items:flex-start;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.hofher{flex:none;padding:6px 10px 0}
+.hofinfo{flex:1;min-width:0}
+.hofinfo h2{font-family:var(--disp);font-size:30px;margin:0 0 2px;line-height:1}
+.hofinfo .small{font-size:12px}
+.sternebig{font-family:var(--mono);font-size:15px;color:var(--gelb);margin-top:10px}
+.roster{display:flex;flex-wrap:wrap;gap:8px}
+.pick{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 8px 4px;
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);cursor:pointer;font:inherit}
+.pick span{font-family:var(--mono);font-size:10px;color:var(--ink-40)}
+.pick.on{border-color:var(--ink);background:#fff}
+.pick.on span{color:var(--ink)}
+.pick.off{opacity:.4;cursor:default}
+@media(max-width:560px){
+  .hof{flex-direction:column;gap:12px;align-items:center;text-align:center}
+  .hofinfo{text-align:center}
+  .roster{justify-content:center}
+}
+
+/* the shop */
+.laden{display:grid;grid-template-columns:1fr 1fr;gap:18px;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-bottom:20px}
+.laden .full{grid-column:1/-1;margin:0;font-size:12px}
+.buys{display:flex;flex-wrap:wrap;gap:8px}
+.buy{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--paper);
+  border:1px solid var(--line);border-radius:var(--r);cursor:pointer;font:inherit;font-size:13px}
+.buy i{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--gelb)}
+.buy:hover:not(:disabled){border-color:var(--ink-40)}
+.buy:disabled{cursor:default;opacity:.45}
+.buy.have{opacity:1;border-color:var(--gruen)}
+.buy.have i{color:var(--gruen)}
+@media(max-width:560px){.laden{grid-template-columns:1fr}}
+
+/* the map */
+.karte{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));
+  background:var(--paper-2);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:28px 28px;background-position:-1px -1px;
+  border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:18px}
+.prov{position:relative;overflow:hidden;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  background:var(--card);border:1px solid var(--line);border-radius:6px;padding:11px 12px 8px;
+  display:flex;flex-direction:column;gap:6px}
+.prov:hover:not(:disabled){border-color:var(--ink-40);transform:translateY(-2px)}
+.prov.locked{background:transparent;border-style:dashed;cursor:default}
+.prov.locked .pn{color:var(--ink-40)}
+.prov.asleep{background:#EDEDE8}
+.prov .ph{display:flex;align-items:center;gap:7px}
+.prov .ph b{font-family:var(--disp);font-size:17px;letter-spacing:.01em}
+.prov .pdot{width:9px;height:9px;border-radius:2px;flex:none}
+.prov .pn{font-size:11.5px;color:var(--ink-60);font-family:var(--mono)}
+.plots{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+.plots i{display:block;height:15px;border-radius:2px}
+.pfoot{display:block;margin-top:2px}
+.scene{display:block;width:100%;image-rendering:pixelated}
+.band{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);
+  padding:12px 14px 8px;margin-bottom:14px;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:28px 28px;background-position:-1px -1px}
+.band .scene{max-height:132px}
+.endher{display:flex;align-items:center;gap:14px;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:14px 0 4px;text-align:left}
+.endher>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.endher b{font-family:var(--disp);font-size:20px;line-height:1.15}
+.endher .muted{font-size:12px;font-family:var(--mono)}
+@media(max-width:420px){.endher b{font-size:17px}}
+
+.hedge{position:absolute;left:0;right:0;bottom:0;height:5px;opacity:.45;
+  background:repeating-linear-gradient(90deg,var(--rot) 0 3px,transparent 3px 8px)}
+@media(prefers-reduced-motion:reduce){.prov:hover:not(:disabled){transform:none}}
+@media(min-width:820px){
+  .prov:nth-child(2){transform:translateY(12px)}
+  .prov:nth-child(3){transform:translateY(-6px)}
+  .prov:nth-child(5){transform:translateY(10px)}
+  .prov:nth-child(2):hover:not(:disabled){transform:translateY(10px)}
+  .prov:nth-child(3):hover:not(:disabled){transform:translateY(-8px)}
+  .prov:nth-child(5):hover:not(:disabled){transform:translateY(8px)}
+}
+
+/* the eighteen fields */
+.felder{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));margin-top:12px}
+.feld{text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--paper);
+  border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;display:flex;flex-direction:column;gap:5px}
+.feld:hover{border-color:var(--ink-40)}
+.feld.due{border-color:var(--rot)}
+.feld .fn{font-family:var(--disp);font-size:16px;line-height:1}
+.feld .fbar{display:block;height:5px;background:var(--paper-2);border-radius:3px;overflow:hidden}
+.feld .fbar i{display:block;height:100%;border-radius:3px}
+.feld .fm{font-family:var(--mono);font-size:10.5px;color:var(--ink-40)}
+.sterneline{font-size:14px;margin:10px 0 4px}
+.sterneline b{color:var(--gelb);font-family:var(--mono)}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="top-row">
     <a class="mark" href="index.html" title="Zur Übersicht">Wort<span>werk</span></a>
+    <span id="hofMini"></span>
     <div class="spacer"></div>
     <div class="chip" id="chLevel">Stufe 1</div>
     <div class="chip fire" id="chStreak">0 Tage</div>
@@ -302,6 +414,7 @@ body{overflow-x:clip}
 <nav class="tabs" role="tablist">
   <div class="in">
     <button role="tab" data-view="heute" aria-selected="true">Heute</button>
+    <button role="tab" data-view="reich" aria-selected="false">Reich</button>
     <button role="tab" data-view="wortschatz" aria-selected="false">Wortschatz</button>
     <button role="tab" data-view="werkstatt" aria-selected="false">Werkstatt</button>
     <button role="tab" data-view="strecke" aria-selected="false">Strecke</button>
@@ -405,6 +518,15 @@ body{overflow-x:clip}
 </section>
 
 <!-- ============ WORTSCHATZ ============ -->
+<section id="v-reich" class="hide">
+  <p class="eyebrow">Das Reich</p>
+  <h1 style="font-family:var(--disp);font-size:34px;margin:2px 0 6px;line-height:1">Sechs Provinzen, eine Straße</h1>
+  <p class="muted" style="max-width:56ch;margin-bottom:18px">Every field and every crown below is the scheduler, redrawn — nothing here is bought with time. Neglect lets a province sleep; it never takes anything away.</p>
+  <div id="reichHof"></div>
+  <div id="reichKarte" class="karte"></div>
+  <div id="reichDetail"></div>
+</section>
+
 <section id="v-wortschatz" class="hide">
   <div class="panel">
     <p class="eyebrow">Coverage · Paket 1</p>
@@ -2039,7 +2161,142 @@ Nesthäkchen|nest + little hook|The youngest child of the family.
 Katzensprung|cat + jump|A very short distance; a stone's throw.
 Schwarzfahrer|black + rider|Someone riding without a ticket.
 Rabeneltern|raven + parents|Neglectful parents. Unfair to ravens.
-Wunschdenken|wish + thinking|Wishful thinking.`;
+Wunschdenken|wish + thinking|Wishful thinking.
+Waldeinsamkeit|forest + solitude|The particular peace of being alone among trees.
+Gemütlichkeit|from Gemüt, the disposition|Warmth, ease and belonging, all in one room.
+Zweisamkeit|two-someness|The closeness of being a pair. Built as the opposite of Einsamkeit.
+Heimat|home ground|The place you are from, in a sense no single English word carries.
+Liebeskummer|love + sorrow|The specific grief of a heart that has come apart.
+Herzklopfen|heart + knocking|A pounding chest, from fear or from hope.
+Gänsehaut|goose + skin|Goosebumps.
+Seelenfrieden|soul + peace|Peace of mind.
+Lebenskünstler|life + artist|Someone with a gift for living well on very little.
+Lebenslust|life + appetite|An open, greedy appetite for being alive.
+Freudentränen|joy + tears|Tears that arrive from the good side.
+Herzenswunsch|heart's + wish|The wish underneath all the other wishes.
+Sehnsuchtsort|longing + place|A place you ache for, whether or not you have been there.
+Tagtraum|day + dream|A daydream.
+Traumtänzer|dream + dancer|Someone who lives comfortably on illusions.
+Geistesblitz|spirit + lightning|A sudden flash of insight.
+Denkanstoß|thought + push|Something said that sets you thinking.
+Aha-Erlebnis|aha + experience|The moment a thing finally clicks.
+Zeitgefühl|time + feeling|An instinct for how long things actually take.
+Zeitnot|time + need|Being desperately short of time.
+Zeitfenster|time + window|A narrow window of opportunity.
+Zeitlupe|time + magnifying glass|Slow motion.
+Zeitraffer|time + gatherer|Time-lapse.
+Übermorgen|over + tomorrow|The day after tomorrow.
+Vorgestern|before + yesterday|The day before yesterday.
+Langeweile|long + while|Boredom, described as time going slack.
+Kurzweil|short + while|Diversion. The old opposite of Langeweile.
+Lampenfieber|lamp + fever|Stage fright, named for the footlights.
+Reisefieber|travel + fever|The restless jitters before a journey.
+Frühjahrsmüdigkeit|spring + tiredness|The strange listlessness that arrives with the warm weather.
+Katzenjammer|cat + wailing|A hangover, and the gloom that comes with it.
+Sturmfrei|storm + free|Having the place entirely to yourself.
+Feierabendbier|knocking-off + beer|The beer that draws a line under the working day.
+Kaffeeklatsch|coffee + gossip|Coffee and talk, as an institution.
+Abendbrot|evening + bread|Supper, cold, on bread. A national habit.
+Nachtisch|after + table|Pudding.
+Bärenhunger|bear + hunger|Hunger of an unreasonable size.
+Affenhitze|monkey + heat|Sweltering, ridiculous heat.
+Sauwetter|sow + weather|Filthy weather.
+Sauklaue|sow + claw|Handwriting nobody can read.
+Naschkatze|nibble + cat|Someone who cannot leave sweet things alone.
+Nachteule|night + owl|A night owl.
+Frühaufsteher|early + riser|Someone genuinely happy before seven.
+Morgengrauen|morning + greying|Daybreak. Also, conveniently, morning dread.
+Faulpelz|lazy + pelt|A layabout.
+Angsthase|fear + hare|A coward.
+Glückspilz|luck + mushroom|Someone things simply go well for.
+Pechvogel|pitch + bird|Someone misfortune keeps finding.
+Spielverderber|game + spoiler|A killjoy.
+Besserwisser|better + knower|A know-all.
+Erbsenzähler|pea + counter|A nitpicker, counting them one by one.
+Wichtigtuer|important + doer|Someone making a performance of mattering.
+Nervensäge|nerve + saw|A person who saws away at you.
+Quälgeist|torment + spirit|A pest who will not let up.
+Plaudertasche|chatter + bag|A chatterbox.
+Schlaumeier|clever + Meier|A smart alec.
+Schlitzohr|slit + ear|A sly one, not quite to be trusted.
+Weichei|soft + egg|A wimp.
+Sturkopf|stubborn + head|Someone who will not be moved.
+Dickkopf|thick + head|Same again, from the other angle.
+Trotzkopf|defiance + head|A wilful, sulking child.
+Hitzkopf|heat + head|A hothead.
+Sitzriese|sitting + giant|Someone tall only while seated.
+Schlagfertig|strike + ready|Quick with the answer, right when it is needed.
+Wortgewandt|word + agile|Eloquent. Nimble in speech.
+Redselig|talk + blessed|Talkative, in the wearing sense.
+Hellhörig|bright + hearing|Alert to what is really being said. Also: thin-walled.
+Tellerrand|plate + rim|The edge of your own plate, meaning the limit of your outlook.
+Schubladendenken|drawer + thinking|Filing people away in categories.
+Kleinkariert|small + checked|Petty. Patterned in very small squares.
+Fachidiot|subject + idiot|An expert who knows nothing outside the one subject.
+Papierkrieg|paper + war|A protracted battle with paperwork.
+Amtsschimmel|office + white horse|Bureaucracy, imagined as a plodding grey mare.
+Behördendschungel|authorities + jungle|The thicket you enter to get one form stamped.
+Schreibtischtäter|desk + perpetrator|Someone who does great harm without leaving their chair.
+Schnellschuss|quick + shot|A job done far too fast.
+Zugzwang|move + compulsion|Having to move when every move makes it worse.
+Ellenbogengesellschaft|elbow + society|A society in which everyone elbows past everyone else.
+Zivilcourage|civil + courage|The nerve to speak up in public when it would be easier not to.
+Vergangenheitsbewältigung|past + coping|The long public work of facing a country's own history.
+Weltanschauung|world + view|An entire way of seeing things, not merely an opinion.
+Realpolitik|real + politics|Politics run on hard practicality rather than principle.
+Bildungsroman|education + novel|A novel about someone growing up.
+Leitmotiv|leading + motif|A theme that keeps returning.
+Doppelgänger|double + goer|Your exact likeness, walking around.
+Poltergeist|racket + ghost|A ghost that makes a noise.
+Kindergarten|children + garden|Nursery school, and the word the world borrowed.
+Sorgenkind|worry + child|The one that keeps causing trouble. Often not a child.
+Kummerkasten|sorrow + box|The box you post complaints into.
+Sorgenfalte|worry + crease|The line worry leaves on a face.
+Mutterseelenallein|mother-soul + alone|Utterly alone, with not one soul anywhere.
+Fernbeziehung|distance + relationship|A relationship carried on across a map.
+Seelenverwandt|soul + related|Kindred, at some level below conversation.
+Muttersprache|mother + tongue|The language you did not have to learn.
+Fernsprecher|far + speaker|The old official word for a telephone.
+Wolkenkratzer|cloud + scratcher|A skyscraper.
+Glühbirne|glow + pear|A light bulb.
+Staubsauger|dust + sucker|A vacuum cleaner.
+Kühlschrank|cool + cupboard|A fridge.
+Fernseher|far + seer|A television.
+Krankenhaus|sick + house|A hospital.
+Flugzeug|fly + gear|An aeroplane.
+Feuerzeug|fire + gear|A lighter.
+Werkzeug|work + gear|A tool.
+Spielzeug|play + gear|A toy.
+Handschuh|hand + shoe|A glove.
+Zahnstocher|tooth + poker|A toothpick.
+Daumenkino|thumb + cinema|A flip book.
+Löwenzahn|lion + tooth|A dandelion.
+Vergissmeinnicht|forget + me + not|A forget-me-not.
+Fledermaus|flutter + mouse|A bat.
+Waschbär|wash + bear|A raccoon.
+Faultier|lazy + animal|A sloth.
+Nacktschnecke|naked + snail|A slug.
+Schildkröte|shield + toad|A tortoise.
+Nilpferd|Nile + horse|A hippopotamus.
+Meerschweinchen|sea + piglet|A guinea pig.
+Eichhörnchen|oak + little horn|A squirrel.
+Marienkäfer|Mary + beetle|A ladybird.
+Jein|ja + nein|Yes and no at the same time, and meant seriously.
+Quatsch|nonsense|Rubbish. The everyday word for it.
+Blödsinn|silly + sense|Nonsense.
+Wirrwarr|tangle|Complete confusion.
+Krimskrams|odds and ends|Clutter, bits and bobs.
+Firlefanz|frippery|Pointless decoration.
+Larifari|waffle|Empty talk.
+Schnickschnack|frills|Bells and whistles.
+Mischmasch|mishmash|A jumble of things that do not belong together.
+Wischiwaschi|wishy-washy|Vague, non-committal, saying nothing.
+Tohuwabohu|from the Hebrew tohu wa-bohu|Absolute chaos.
+Techtelmechtel|dalliance|A small affair, conducted quietly.
+Schickimicki|chi-chi|Flashy people and the places they go.
+Trubel|bustle|Cheerful commotion.
+Gedöns|carry-on|Fuss made over nothing.
+`;
 const IDIOM_RAW=`Das läuft wie geschmiert.|That's running like clockwork.
 Du hast den Nagel auf den Kopf getroffen.|You've hit the nail on the head.
 Da geht die Post ab!|Now things are really moving!
@@ -2352,7 +2609,8 @@ const DEFAULT = {
   shaky: 0,
   last: null,          // resume marker
   len: 20, plan: 'mix',
-  sync: { url: '', token: '', auto: false }
+  sync: { url: '', token: '', auto: false },
+  reich: { sterne: 0, tend: 'p1', kleid: {}, land: {}, mast: 0, day: 0, init: 0 }
 };
 let S = JSON.parse(JSON.stringify(DEFAULT));
 
@@ -2717,7 +2975,7 @@ function stats() {
     const k = SRS.key(w.i, s);
     if (!S.sched[k]) unseen++; else if (S.sched[k][1] <= today()) due++;
   }));
-  PACKS[PACK.id] = { name: PACK.name, order: PACK.order, total: LEX.length, learned, mastered, at: today() };
+  PACKS[PACK.id] = { name: PACK.name, order: PACK.order, total: LEX.length, learned, mastered, due, at: today() };
   return { learned, mastered, seen, due, unseen };
 }
 /* Route to C2 counts every pack you've installed, not just this one. */
@@ -2792,6 +3050,7 @@ function buildQueue() {
   const plan = PLANS.find(p => p.id === S.plan);
   const pool = [];
   LEX.forEach(w => skillsFor(w).forEach(s => {
+    if (typeof FOCUS !== 'undefined' && FOCUS && FOCUS.indexOf(w.topic) < 0) return;
     if (plan.sk && !plan.sk.includes(s)) return;
     const k = SRS.key(w.i, s);
     const rec = S.sched[k];
@@ -3452,6 +3711,497 @@ const KLANG = (() => {
 })();
 
 /* ============================================================
+   7. REICH — the realm.
+
+   Six provinces, one per Paket, each with a princess whose
+   growth is a pure function of the scheduler. Nothing in here
+   can be ground: the figures read exactly the same records the
+   Wortschatz mosaic reads. Sterne buy decoration and nothing
+   else, so a well-dressed princess never means more than a
+   plain one. Neglect makes a province sleep. It never deletes.
+   ============================================================ */
+
+/* ---------- 7.1 Felder — 57 topics folded into 18 fields ---------- */
+const FELDER = [
+  { id: 'zeit', n: 'Zeit', t: ['time'] },
+  { id: 'denk', n: 'Denken', t: ['abstract', 'cognition', 'analysis'] },
+  { id: 'logik', n: 'Logik', t: ['logic', 'reason'] },
+  { id: 'eigen', n: 'Eigenschaft', t: ['quality', 'degree', 'size', 'form', 'manner'] },
+  { id: 'klein', n: 'Wörtchen', t: ['pronoun', 'particle', 'modality', 'modal', 'number', 'quantity'] },
+  { id: 'rede', n: 'Redewendung', t: ['phrase', 'speech', 'language', 'comm'] },
+  { id: 'natur', n: 'Natur', t: ['nature', 'animals', 'space'] },
+  { id: 'essen', n: 'Essen', t: ['food'] },
+  { id: 'ort', n: 'Ort & Weg', t: ['place', 'travel', 'motion'] },
+  { id: 'gesell', n: 'Gesellschaft', t: ['society', 'social', 'law', 'formal'] },
+  { id: 'haus', n: 'Zuhause', t: ['home', 'things', 'clothes'] },
+  { id: 'gefuehl', n: 'Gefühl', t: ['emotion', 'character', 'life', 'habit'] },
+  { id: 'koerper', n: 'Körper', t: ['body', 'health', 'senses'] },
+  { id: 'leute', n: 'Menschen', t: ['people'] },
+  { id: 'geld', n: 'Geld', t: ['money', 'exchange'] },
+  { id: 'arbeit', n: 'Arbeit', t: ['work', 'school'] },
+  { id: 'technik', n: 'Technik', t: ['tech', 'media', 'art', 'leisure', 'sport'] },
+  { id: 'kern', n: 'Kern', t: ['core', 'action', 'change', 'conflict', 'colour'] }
+];
+const FELD_OF = {};
+FELDER.forEach(f => f.t.forEach(t => { FELD_OF[t] = f.id; }));
+const feldOf = w => FELD_OF[w.topic] || 'kern';
+
+/* ---------- 7.2 the six provinces ---------- */
+const PROVINZ = [
+  { pack: 'p1', code: 'A1', land: 'Wurzel', col: '#6A4CE0', her: 'Adelheid' },
+  { pack: 'p2', code: 'A2', land: 'Markt', col: '#0A5FCE', her: 'Berenike' },
+  { pack: 'p3', code: 'B1', land: 'Fluss', col: '#1F9E63', her: 'Cordula' },
+  { pack: 'p4', code: 'B2', land: 'Hügel', col: '#29A3E0', her: 'Dorothea' },
+  { pack: 'p5', code: 'C1', land: 'Turm', col: '#E8A200', her: 'Elisabeth' },
+  { pack: 'p6', code: 'C2', land: 'Krone', col: '#CE3B2B', her: 'Friederike' }
+];
+const SCHLAF = 40;                 /* overdue items before a province sleeps */
+const STUFE_NAME = ['Saat', 'Knospe', 'Blüte', 'Krone'];
+
+/* ---------- 7.3 the sprite: 12 x 16 characters per stage ---------- */
+const E12 = '............';
+const STAGE = [
+  [E12, E12, E12, E12, E12,
+    '..hhhhhhhh..', '..hssssssh..', '..hskssksh..', '..hbssssbh..', '...ssssss...',
+    '....pppp....', '...pppppp...', '...pppppp...', '..pppppppp..', '..pppppppp..', '.pppppppppp.'],
+  [E12, E12, E12,
+    '..hhhhhhhh..', '..hssssssh..', '..hskssksh..', '..hbssssbh..', '...ssssss...', '....ssss....',
+    '..gggggggg..', '..gddddddg..', '..dddddddd..', '.dddddddddd.', '.dwwwwwwwwd.', '.dddddddddd.', 'dddddddddddd'],
+  [E12,
+    '....g.g.....', '...gggggg...', '..hhhhhhhh..', '..hssssssh..', '..hskssksh..', '..hbssssbh..', '...ssssss...', '....ssss....',
+    '..gggggggg..', '..gddddddg..', '..dddddddd..', '.dwwwwwwwwd.', '.dddddddddd.', 'dwwwwwwwwwwd', 'dddddddddddd'],
+  ['...g.g.g....', '...gggggg...', '..hhhhhhhh..', '..hssssssh..', '..hskssksh..', '..hbssssbh..', '...ssssss...', '....ssss....',
+    '..gggggggg..', '..gddddddg..', '..dddddddd..', '.dwwwwwwwwd.', '.dddddddddd.', 'dwwwwwwwwwwd', 'dddddddddddd', 'dggggggggggd']
+];
+
+/* ---------- 7.4 things Sterne can buy ---------- */
+const KLEIDER = [
+  { id: 'zopf', n: 'Zöpfe', kost: 10, px: [[1, 4], [10, 4], [1, 5], [10, 5], [1, 6], [10, 6], [1, 7], [10, 7]], c: '#16181D' },
+  { id: 'kranz', n: 'Blumenkranz', kost: 14, px: [[3, 1, '#E9A8A0'], [4, 1, '#1F9E63'], [5, 1, '#CE3B2B'], [6, 1, '#1F9E63'], [7, 1, '#E9A8A0'], [8, 1, '#1F9E63']] },
+  { id: 'laterne', n: 'Laterne', kost: 18, px: [[0, 9, '#16181D'], [0, 10, '#E8A200'], [1, 10, '#E8A200'], [0, 11, '#E8A200'], [1, 11, '#E8A200'], [0, 12, '#16181D'], [1, 12, '#16181D']] },
+  { id: 'umhang', n: 'Umhang', kost: 24, cloak: true }
+];
+const LAND_SP = {
+  baum: ['..g..', '.ggg.', 'ggggg', '.ggg.', '..t..'],
+  teich: ['.www.', 'wwwww', 'wwwww', '.www.', '.....'],
+  weg: ['.....', 'ss.ss', '.sss.', 'ss.ss', '.....'],
+  zaun: ['.r.r.', 'sssss', '.s.s.', 'sssss', '.s.s.']
+};
+const GELAENDE = [
+  { id: 'weg', n: 'Steinweg', kost: 6 },
+  { id: 'baum', n: 'Obstbaum', kost: 9 },
+  { id: 'zaun', n: 'Rosenzaun', kost: 12 },
+  { id: 'teich', n: 'Teich', kost: 16 }
+];
+const LAND_PAL = { g: '#1F9E63', t: '#8A5A3B', w: '#29A3E0', s: '#C6C9C1', r: '#CE3B2B' };
+
+/* ---------- 7.5 drawing ---------- */
+function tint(hex, amt) {
+  const p = [231, 232, 227];
+  const c = [1, 3, 5].map(i => parseInt(hex.substr(i, 2), 16));
+  return '#' + c.map((v, i) => Math.round(v + (p[i] - v) * amt).toString(16).padStart(2, '0')).join('');
+}
+
+/* ---------- expressions ----------
+   The head sits at a different row in each growth stage, so the face is
+   painted by row offset rather than baked into the stage maps. Six pixels
+   of eye and mouth is the whole emotional range, and that is enough. */
+const EYE_ROW = [7, 5, 5, 4];
+const GESICHT = {
+  ruhe: { e: [4, 7], m: [[3, 'b'], [8, 'b']] },
+  laecheln: { e: [4, 7], m: [[3, 'b'], [8, 'b'], [5, 'k'], [6, 'k']] },
+  freude: { e: [3, 4, 7, 8], m: [[3, 'b'], [8, 'b'], [5, 'k'], [6, 'k']] },
+  staunen: { e: [4, 7], m: [[5, 'k'], [6, 'k']] },
+  schlaf: { e: [3, 4, 5, 6, 7, 8], m: [] }
+};
+
+/* ---------- landscape motifs ---------- */
+const MOT = {
+  weg: ['sss', '.s.', 'sss'],
+  blume: ['.r.', '.g.', '.g.'],
+  baum: ['..g..', '.ggg.', 'ggggg', '.ggg.', '..t..', '..t..'],
+  obst: ['..g..', '.grg.', 'ggggg', '.rgg.', '..t..', '..t..'],
+  haus: ['..ccc..', '.ccccc.', 'ccccccc', '.nnnnn.', '.n.d.n.', '.nndnn.'],
+  turm: ['..f..', '.bbb.', 'bbbbb', 'b.y.b', 'bbbbb', 'bbbbb', 'b.y.b', 'bbbbb', 'bbbbb'],
+  teich: ['.www.', 'wwwww', '.www.'],
+  zaun: ['.r.r.', 'sssss', '.s.s.']
+};
+const MOT_PAL = {
+  g: '#1F9E63', t: '#8A5A3B', w: '#29A3E0', s: '#C6C9C1', r: '#CE3B2B',
+  c: '#CE3B2B', d: '#8A5A3B', n: '#F5F6F2', y: '#E8A200', f: '#E8A200', b: '#8A8F96'
+};
+
+function figureGrid(stufe, col, o) {
+  o = o || {};
+  const sleep = !!o.sleep, worn = o.worn || [];
+  const ix = Math.max(0, Math.min(3, stufe | 0)), rows = STAGE[ix];
+  const dress = sleep ? '#9C9B93' : col;
+  const pale = sleep ? '#CBCAC2' : tint(col, 0.5);
+  const gold = sleep ? '#B4B2A9' : '#E8A200';
+  const pal = { '.': null, k: '#16181D', s: '#F5F6F2', h: '#16181D', d: dress, p: pale, g: gold, w: '#E7E8E3', b: sleep ? '#C9BDBA' : '#E9A8A0' };
+  const grid = {};
+  for (let y = 0; y < rows.length; y++) for (let x = 0; x < 12; x++) {
+    const c = pal[rows[y].charAt(x)]; if (c) grid[x + ',' + y] = c;
+  }
+  const er = EYE_ROW[ix], face = GESICHT[o.face || (sleep ? 'schlaf' : 'ruhe')] || GESICHT.ruhe;
+  for (let x = 3; x <= 8; x++) { grid[x + ',' + er] = pal.s; grid[x + ',' + (er + 1)] = pal.s; }
+  face.e.forEach(x => { grid[x + ',' + er] = pal.k; });
+  face.m.forEach(m => { grid[m[0] + ',' + (er + 1)] = m[1] === 'b' ? pal.b : pal.k; });
+  worn.forEach(id => {
+    const it = KLEIDER.find(k => k.id === id); if (!it) return;
+    if (it.cloak) {
+      const deep = sleep ? '#8E8D86' : tint(col, -0.28);
+      for (let y = 8; y < rows.length; y++) [0, 1, 10, 11].forEach(x => { if (grid[x + ',' + y] || y > 10) grid[x + ',' + y] = deep; });
+    } else it.px.forEach(p => { grid[p[0] + ',' + p[1]] = sleep ? '#B4B2A9' : (p[2] || it.c); });
+  });
+  return { grid: grid, h: rows.length };
+}
+
+function spriteSVG(stufe, col, o) {
+  o = o || {};
+  const px = o.px || 4, f = figureGrid(stufe, col, o);
+  let out = '<svg class="sprite" width="' + (12 * px) + '" height="' + (f.h * px) +
+    '" viewBox="0 0 12 ' + f.h + '" shape-rendering="crispEdges" aria-hidden="true">';
+  Object.keys(f.grid).forEach(k => { const xy = k.split(','); out += '<rect x="' + xy[0] + '" y="' + xy[1] + '" width="1" height="1" fill="' + f.grid[k] + '"/>'; });
+  return out + '</svg>';
+}
+
+/* ---------- the province landscape ----------
+   Nothing here is placed by hand and nothing is random: each motif has a
+   threshold, so the same progress always builds the same country. It is a
+   progress bar that happens to look like somewhere you could live. */
+function sceneSVG(col, o) {
+  o = o || {};
+  const fl = o.fl || 0, fm = o.fm || 0, sleep = !!o.sleep, extra = o.extra || [];
+  const W = 78, H = 22, GY = 20;
+  const items = [];
+  if (fl > 0) items.push('weg');
+  if (fl >= 0.02) items.push('blume');
+  if (fl >= 0.05) items.push('haus');
+  if (fl >= 0.10) items.push(fm >= 0.08 ? 'obst' : 'baum');
+  if (fl >= 0.18) items.push('teich');
+  if (fl >= 0.25) items.push('turm');
+  if (fl >= 0.35) items.push(fm >= 0.15 ? 'obst' : 'baum');
+  if (fl >= 0.50) items.push('zaun');
+  extra.forEach(id => { if (MOT[id]) items.push(id); });
+
+  const dull = c => sleep ? '#B4B2A9' : c;
+  let out = '<svg class="scene" viewBox="0 0 ' + W + ' ' + H + '" width="100%" ' +
+    'preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges" aria-hidden="true">';
+  const gamt = Math.max(0, 0.78 - Math.min(0.78, fl * 1.6));
+  out += '<rect x="0" y="' + GY + '" width="' + W + '" height="1" fill="' + (sleep ? '#C4C3BA' : tint('#1F9E63', gamt)) + '"/>';
+  if (!sleep && fm >= 0.30) out += '<rect x="70" y="1" width="3" height="3" fill="#E8A200"/>';
+
+  items.slice(0, 7).forEach((id, i) => {
+    const m = MOT[id]; if (!m) return;
+    const w = m[0].length, h = m.length, x0 = 1 + i * 8, y0 = GY - h;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const c = MOT_PAL[m[y].charAt(x)];
+      if (c) out += '<rect x="' + (x0 + x) + '" y="' + (y0 + y) + '" width="1" height="1" fill="' + dull(c) + '"/>';
+    }
+  });
+  if (!o.leer) {
+    const f = figureGrid(o.stufe || 0, col, { sleep: sleep, worn: o.worn, face: o.face });
+    const fx = W - 14, fy = GY - f.h;
+    Object.keys(f.grid).forEach(k => {
+      const xy = k.split(',');
+      out += '<rect x="' + (fx + (+xy[0])) + '" y="' + (fy + (+xy[1])) + '" width="1" height="1" fill="' + f.grid[k] + '"/>';
+    });
+  }
+  return out + '</svg>';
+}
+
+function landSVG(id, px) {
+  const m = LAND_SP[id]; if (!m) return '';
+  let out = '<svg width="' + (5 * px) + '" height="' + (5 * px) + '" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true">';
+  for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) {
+    const c = LAND_PAL[m[y].charAt(x)];
+    if (c) out += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + c + '"/>';
+  }
+  return out + '</svg>';
+}
+
+/* ---------- 7.6 reading the scheduler ---------- */
+function reichFelder() {
+  const m = {}, t = today();
+  FELDER.forEach(f => { m[f.id] = { total: 0, seen: 0, learned: 0, mastered: 0, due: 0 }; });
+  LEX.forEach(w => {
+    const f = m[feldOf(w)]; if (!f) return;
+    const sk = skillsFor(w), mk = SRS.key(w.i, 'm');
+    f.total++;
+    if (S.sched[mk]) f.seen++;
+    if (SRS.box(mk) >= 3) f.learned++;
+    if (sk.every(s => SRS.box(SRS.key(w.i, s)) >= 5)) f.mastered++;
+    sk.forEach(s => { const r = S.sched[SRS.key(w.i, s)]; if (r && r[1] <= t) f.due++; });
+  });
+  return m;
+}
+
+/* stats() walks all 1153 words twice, and paintHeader fires after every
+   single answer. The figure can only change stage once in a few hundred
+   answers, so the scan is cached for two seconds; the realm view forces
+   a fresh read so what you are looking at is never stale. */
+var _live = { t: 0, v: null };
+function liveStat(force) {
+  const now = Date.now();
+  if (!force && _live.v && now - _live.t < 2000) return _live.v;
+  const s = stats();
+  _live = { t: now, v: { built: true, here: true, total: LEX.length, learned: s.learned, mastered: s.mastered, seen: s.seen, due: s.due } };
+  return _live.v;
+}
+
+function provStat(p, force) {
+  if (p.pack === PACK.id) return liveStat(force);
+  const r = PACKS[p.pack];
+  if (r) return { built: true, here: false, total: r.total, learned: r.learned, mastered: r.mastered, seen: r.learned, due: 0 };
+  return { built: false, here: false, total: 0, learned: 0, mastered: 0, seen: 0, due: 0 };
+}
+
+/* learned drives her growth so there is movement in week one;
+   mastered drives the gold, which stays hard to earn. */
+function stufeOf(st) {
+  if (!st.total) return 0;
+  const f = st.learned / st.total;
+  return f >= 0.40 ? 3 : f >= 0.15 ? 2 : f >= 0.03 ? 1 : 0;
+}
+
+/* ---------- 7.7 state ---------- */
+function reichInit() {
+  if (!S.reich) S.reich = { sterne: 0, tend: 'p1', kleid: {}, land: {}, mast: 0, day: 0 };
+  const R = S.reich;
+  if (R.sterne == null) R.sterne = 0;
+  if (!R.tend) R.tend = 'p1';
+  if (!R.kleid) R.kleid = {};
+  if (!R.land) R.land = {};
+  if (R.mast == null) R.mast = 0;
+  /* Progress earned before the realm existed is not backpaid — otherwise a
+     long-standing learner would open this to thousands of Sterne and nothing
+     left to want. The baseline is set once, with a small gift to start. */
+  if (!R.init) { R.init = 1; R.mast = stats().mastered; R.sterne += 15; save(); }
+}
+/* ---------- 7.7b mood ----------
+   A reaction is transient state, never saved. She is calm by default,
+   asleep when the province is, and briefly delighted when you have just
+   done something well. Nothing about her mood changes what she is worth. */
+var MOOD = null, LASTCOMBO = 0, MOODT = null;
+function mood(face, ms) {
+  ms = ms || 6000;
+  MOOD = { face: face, until: Date.now() + ms };
+  if (MOODT) clearTimeout(MOODT);
+  MOODT = setTimeout(function () {
+    MOOD = null;
+    try { paintMini(); paintStrip(); if (VIEW === 'reich') paintReich(); } catch (e) { }
+  }, ms);
+  try { paintMini(); paintStrip(); } catch (e) { }
+}
+function faceNow(sleep) {
+  if (sleep) return 'schlaf';
+  if (MOOD && Date.now() < MOOD.until) return MOOD.face;
+  return 'ruhe';
+}
+
+const tended = () => PROVINZ.find(p => p.pack === (S.reich && S.reich.tend)) || PROVINZ[0];
+const worn = pk => (S.reich.kleid[pk] || []);
+const built = pk => (S.reich.land[pk] || []);
+
+/* ---------- 7.8 Sterne — milestones only, never volume ---------- */
+function reichAfter() {
+  reichInit();
+  const R = S.reich, s = (typeof SESSION !== 'undefined' && SESSION) ? SESSION : null;
+  const st = stats();
+  let got = 0; const why = [];
+  const dm = Math.max(0, st.mastered - (R.mast || 0));
+  if (dm) { got += dm * 3; why.push(dm + ' gemeistert'); }
+  R.mast = st.mastered;
+  if (s && s.q && s.q.length >= 10 && s.right === s.q.length) { got += 5; why.push('makellos'); }
+  if (S.lastDay !== R.day) { got += 2; why.push('neuer Tag'); R.day = S.lastDay; }
+  if (got) R.sterne += got;
+  FOCUS = null;
+  save(true);
+
+  const host = $('#endMissed');
+  if (host) {
+    const tp = tended(), tst = provStat(tp, true), tsl = tst.due >= SCHLAF, tstu = stufeOf(tst);
+    const pct = (s && s.q && s.q.length) ? s.right / s.q.length : 0;
+    const face = tsl ? 'schlaf' : pct >= 0.9 ? 'freude' : pct >= 0.7 ? 'laecheln' : 'ruhe';
+    mood(face, 30000);
+    const say = tsl ? tp.her + ' schläft noch — ein Feld genügt, um sie zu wecken.'
+      : pct >= 0.9 ? tp.her + ' strahlt.'
+        : pct >= 0.7 ? tp.her + ' lächelt.'
+          : tp.her + ' nickt dir ruhig zu.';
+    let panel = $('#endHer');
+    if (!panel) { panel = document.createElement('div'); panel.id = 'endHer'; panel.className = 'endher'; host.parentNode.insertBefore(panel, host); }
+    panel.innerHTML = spriteSVG(tstu, tp.col, { px: 6, sleep: tsl, worn: worn(tp.pack), face: face }) +
+      '<div><b>' + say + '</b><span class="muted">' + tp.code + ' · ' + tp.land + ' · ' + STUFE_NAME[tstu] + '</span></div>';
+    let line = $('#endSterne');
+    if (!line) { line = document.createElement('p'); line.id = 'endSterne'; line.className = 'sterneline'; host.parentNode.insertBefore(line, host); }
+    line.innerHTML = got
+      ? '<b>✦ +' + got + ' Sterne</b> <span class="muted">· ' + why.join(' · ') + '</span>'
+      : '<span class="muted">Keine Sterne diesmal — sie kommen von Meilensteinen, nicht von Menge.</span>';
+  }
+  paintMini(); if (VIEW === 'reich') paintReich();
+}
+
+/* ---------- 7.9 a focused session ---------- */
+function uebeFeld(fid) {
+  const f = FELDER.find(x => x.id === fid); if (!f) return;
+  if (!LEX.some(w => feldOf(w) === fid)) { toast('Dieses Feld ist leer.'); return; }
+  FOCUS = f.t;
+  show('heute');
+  startSession();
+  toast('Feld: ' + f.n);
+}
+
+/* ---------- 7.10 painting ---------- */
+function paintMini() {
+  const el = $('#hofMini'); if (!el) return;
+  reichInit();
+  const p = tended(), st = provStat(p, false), sl = st.due >= SCHLAF;
+  const sess = (typeof SESSION !== 'undefined') ? SESSION : null;
+  if (sess && sess.combo !== LASTCOMBO) {
+    const c = sess.combo; LASTCOMBO = c;           /* set first: mood() repaints */
+    if (c >= 5 && c % 5 === 0) mood('freude', 2600);
+  }
+  el.innerHTML = spriteSVG(stufeOf(st), p.col, { px: 2, sleep: sl, worn: worn(p.pack), face: faceNow(sl) });
+  el.title = p.her + ' · ' + STUFE_NAME[stufeOf(st)];
+  const strip = $('#reichStrip'), run = $('#sessionRun');
+  if (strip) strip.style.display = (run && !run.classList.contains('hide')) ? 'none' : 'flex';
+}
+
+function paintStrip() {
+  const home = $('#v-heute'); if (!home) return;
+  reichInit();
+  let s = $('#reichStrip');
+  if (!s) { s = document.createElement('button'); s.id = 'reichStrip'; s.className = 'strip'; s.onclick = () => show('reich'); home.insertBefore(s, home.firstChild); }
+  const p = tended(), st = provStat(p, false), sl = st.due >= SCHLAF;
+  const run = $('#sessionRun');
+  s.style.display = (run && !run.classList.contains('hide')) ? 'none' : 'flex';
+  s.innerHTML = spriteSVG(stufeOf(st), p.col, { px: 3, sleep: sl, worn: worn(p.pack), face: faceNow(sl) }) +
+    '<span class="stript"><b>' + p.her + '</b><span class="muted">' + p.code + ' · ' + p.land + ' · ' +
+    (sl ? 'schläft' : STUFE_NAME[stufeOf(st)]) + '</span></span>' +
+    '<span class="sterne">✦ ' + S.reich.sterne + '</span>';
+}
+
+function paintReich() {
+  reichInit();
+  liveStat(true);
+  paintHof(); paintKarte();
+  if (OFFEN) paintDetail(OFFEN);
+}
+
+function paintHof() {
+  const p = tended(), st = provStat(p), sl = st.due >= SCHLAF, stu = stufeOf(st);
+  const roster = PROVINZ.map(q => {
+    const qs = provStat(q), on = q.pack === p.pack;
+    return '<button class="pick' + (on ? ' on' : '') + (qs.built ? '' : ' off') + '" data-tend="' + q.pack + '"' +
+      (qs.built ? '' : ' disabled') + ' title="' + q.her + '">' +
+      spriteSVG(stufeOf(qs), q.col, { px: 2, sleep: qs.due >= SCHLAF, worn: worn(q.pack), face: q.pack === p.pack ? faceNow(qs.due >= SCHLAF) : null }) +
+      '<span>' + q.her.slice(0, 1) + '</span></button>';
+  }).join('');
+
+  const shop = (list, kind) => list.map(it => {
+    const have = (kind === 'k' ? worn(p.pack) : built(p.pack)).includes(it.id);
+    const can = S.reich.sterne >= it.kost;
+    return '<button class="buy' + (have ? ' have' : '') + '" data-buy="' + kind + ':' + it.id + '"' +
+      (have || !can ? ' disabled' : '') + '>' +
+      (kind === 'l' ? landSVG(it.id, 4) : '') + it.n +
+      '<i>' + (have ? 'da' : '✦ ' + it.kost) + '</i></button>';
+  }).join('');
+
+  $('#reichHof').innerHTML =
+    '<div class="band">' + sceneSVG(p.col, {
+      fl: st.total ? st.learned / st.total : 0, fm: st.total ? st.mastered / st.total : 0,
+      sleep: sl, stufe: stu, worn: worn(p.pack), extra: built(p.pack), face: faceNow(sl)
+    }) + '</div>' +
+    '<div class="hof">' +
+    '<div class="hofher">' + spriteSVG(stu, p.col, { px: 9, sleep: sl, worn: worn(p.pack), face: faceNow(sl) }) + '</div>' +
+    '<div class="hofinfo">' +
+    '<p class="eyebrow">Du begleitest</p><h2>' + p.her + '</h2>' +
+    '<p class="muted">' + p.code + ' · Provinz ' + p.land + ' — ' + (sl ? 'sie schläft, ' + st.due + ' Wörter warten' : STUFE_NAME[stu]) + '</p>' +
+    '<p class="muted small">' + st.learned + ' gelernt · ' + st.mastered + ' gemeistert von ' + st.total + '</p>' +
+    '<div class="sternebig">✦ ' + S.reich.sterne + ' Sterne</div>' +
+    '<p class="eyebrow" style="margin-top:14px">Wen begleitest du?</p><div class="roster">' + roster + '</div>' +
+    '</div></div>' +
+    '<div class="laden"><div><p class="eyebrow">Kleider</p><div class="buys">' + shop(KLEIDER, 'k') + '</div></div>' +
+    '<div><p class="eyebrow">Gelände</p><div class="buys">' + shop(GELAENDE, 'l') + '</div></div>' +
+    '<p class="muted small full">Sterne kommen von Meilensteinen — gemeisterte Wörter, makellose Runden, neue Tage. Nie vom Tempo. Alles hier ist Schmuck: keine Kleidung macht dich schneller.</p></div>';
+
+  $$('#reichHof [data-tend]').forEach(b => b.onclick = () => {
+    S.reich.tend = b.dataset.tend; save(); paintReich(); paintMini(); paintStrip(); KLANG.se('page');
+  });
+  $$('#reichHof [data-buy]').forEach(b => b.onclick = () => {
+    const [kind, id] = b.dataset.buy.split(':');
+    const it = (kind === 'k' ? KLEIDER : GELAENDE).find(x => x.id === id);
+    if (!it || S.reich.sterne < it.kost) return;
+    const bag = kind === 'k' ? (S.reich.kleid[p.pack] = worn(p.pack).slice()) : (S.reich.land[p.pack] = built(p.pack).slice());
+    if (bag.includes(id)) return;
+    bag.push(id); S.reich.sterne -= it.kost; save(true);
+    toast(it.n + ' — für ' + p.her); KLANG.se('badge');
+    paintReich(); paintMini(); paintStrip();
+  });
+}
+
+function paintKarte() {
+  $('#reichKarte').innerHTML = PROVINZ.map(p => {
+    const st = provStat(p), sl = st.built && st.due >= SCHLAF, stu = stufeOf(st);
+    const f = st.here ? reichFelder() : null;
+    const plots = FELDER.map(fd => {
+      if (!f) return '<i style="background:#DDDFD8"></i>';
+      const d = f[fd.id], fm = d.total ? d.mastered / d.total : 0, fl = d.total ? d.learned / d.total : 0;
+      const bg = sl ? (fl > 0 ? '#C4C3BA' : '#DDDFD8')
+        : fm >= 0.5 ? p.col : fl >= 0.35 ? tint(p.col, 0.4) : fl > 0 ? tint(p.col, 0.7) : d.seen ? tint(p.col, 0.85) : '#DDDFD8';
+      return '<i style="background:' + bg + '" title="' + fd.n + ' — ' + d.learned + '/' + d.total + '"></i>';
+    }).join('');
+    const land = st.built ? sceneSVG(p.col, {
+      fl: st.total ? st.learned / st.total : 0, fm: st.total ? st.mastered / st.total : 0,
+      sleep: sl, stufe: stu, worn: worn(p.pack), extra: built(p.pack),
+      face: p.pack === S.reich.tend ? faceNow(sl) : null
+    }) : sceneSVG(p.col, { fl: 0, fm: 0, leer: true });
+    return '<button class="prov' + (st.built ? '' : ' locked') + (sl ? ' asleep' : '') + '" data-prov="' + p.pack + '"' +
+      (st.built ? '' : ' disabled') + '>' +
+      '<span class="ph"><i class="pdot" style="background:' + (st.built ? (sl ? '#9C9B93' : p.col) : '#C6C9C1') + '"></i>' +
+      '<b>' + p.code + ' · ' + p.land + '</b></span>' +
+      '<span class="pn">' + (st.built ? (sl ? 'schläft · ' + st.due + ' fällig' : p.her + ' · ' + STUFE_NAME[stu]) : 'noch nicht') + '</span>' +
+      '<span class="plots">' + plots + '</span>' +
+      '<span class="pfoot">' + land + '</span>' +
+      (sl ? '<span class="hedge"></span>' : '') + '</button>';
+  }).join('');
+  $$('#reichKarte [data-prov]').forEach(b => b.onclick = () => { OFFEN = b.dataset.prov; paintDetail(OFFEN); KLANG.se('page'); });
+}
+
+var OFFEN = null;
+function paintDetail(pack) {
+  const p = PROVINZ.find(x => x.pack === pack), st = provStat(p), host = $('#reichDetail');
+  if (!p || !st.built) { host.innerHTML = ''; return; }
+  if (!st.here) {
+    host.innerHTML = '<div class="card"><p class="eyebrow">' + p.code + ' · ' + p.land + '</p>' +
+      '<p class="muted">' + p.her + ' lebt in einem anderen Paket. Öffne es, um ihre Felder zu sehen.</p></div>';
+    return;
+  }
+  const f = reichFelder();
+  host.innerHTML = '<div class="card"><p class="eyebrow">' + p.code + ' · Provinz ' + p.land + '</p>' +
+    '<h3 style="margin:2px 0 4px">Die achtzehn Felder</h3>' +
+    '<p class="muted small">Ein Feld antippen heißt: genau diese Wörter üben. Was rot umrandet ist, wartet schon.</p>' +
+    '<div class="felder">' + FELDER.map(fd => {
+      const d = f[fd.id], pct = d.total ? Math.round(100 * d.learned / d.total) : 0;
+      return '<button class="feld' + (d.due ? ' due' : '') + '" data-feld="' + fd.id + '">' +
+        '<span class="fn">' + fd.n + '</span>' +
+        '<span class="fbar"><i style="width:' + pct + '%;background:' + p.col + '"></i></span>' +
+        '<span class="fm">' + d.learned + '/' + d.total + (d.due ? ' · ' + d.due + ' fällig' : '') + '</span></button>';
+    }).join('') + '</div></div>';
+  $$('#reichDetail [data-feld]').forEach(b => b.onclick = () => uebeFeld(b.dataset.feld));
+  NAV.enter(host);
+}
+
+/* ---------- 7.11 hook into what already exists ---------- */
+var FOCUS = null;
+(function () {
+  const _hd = paintHeader; paintHeader = function () { _hd.apply(this, arguments); try { paintMini(); } catch (e) { } };
+  const _ht = paintHeute; paintHeute = function () { _ht.apply(this, arguments); try { paintStrip(); } catch (e) { } };
+  const _es = endSession; endSession = function () { _es.apply(this, arguments); try { reichAfter(); } catch (e) { } };
+})();
+
+/* ============================================================
    NAV — softer page changes.
    One veil per page: it fades out on arrival (pure CSS, so it
    works even if this script never runs) and fades in before a
@@ -3494,12 +4244,13 @@ const NAV = (() => {
 let VIEW = null;
 function show(v) {
   const was = VIEW; VIEW = v;
-  ['heute', 'wortschatz', 'werkstatt', 'strecke'].forEach(x => $('#v-' + x).classList.toggle('hide', x !== v));
+  ['heute', 'reich', 'wortschatz', 'werkstatt', 'strecke'].forEach(x => $('#v-' + x).classList.toggle('hide', x !== v));
   $$('nav.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.view === v));
   if (v === 'heute') paintHeute();
   if (v === 'wortschatz') { paintMosaic(); paintList(); }
   if (v === 'werkstatt') paintRef();
   if (v === 'strecke') paintStrecke();
+  if (v === 'reich') paintReich();
   if (window.scrollY) window.scrollTo(0, 0);
   NAV.enter($('#v-' + v));
   if (was && was !== v) KLANG.se('page');
