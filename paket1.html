@@ -398,6 +398,7 @@ body{overflow-x:clip}
 .sterneline{font-size:14px;margin:10px 0 4px}
 .sterneline b{color:var(--gelb);font-family:var(--mono)}
 </style>
+<script src="season.js"></script>
 </head>
 <body>
 <header class="top">
@@ -441,6 +442,8 @@ body{overflow-x:clip}
       <div class="mean" id="wotdM"></div>
       <span class="flip" id="wotdF">tap</span>
     </div>
+
+    <div style="margin:2px 0 12px"><span data-season-slot></span></div>
 
     <div class="grid4" style="margin-bottom:14px">
       <div class="stat"><b id="stDue">0</b><s>due now</s></div>
@@ -2955,8 +2958,37 @@ const BADGES = [
   { id: 'k15', icon: '⚡', name: 'Kombo', desc: '15 right in a row', test: s => s.bestCombo >= 15 },
   { id: 'w100', icon: '◆', name: 'Hundert Wörter', desc: '100 words learned', test: (s, st) => st.learned >= 100 },
   { id: 'w500', icon: '◈', name: 'A2-Schwelle', desc: '500 words learned', test: (s, st) => st.learned >= 500 },
-  { id: 'pack1', icon: '★', name: 'Paket 1', desc: 'Every word in pack 1 mastered', test: (s, st) => st.mastered >= LEX.length }
+  { id: 'pack1', icon: '★', name: 'Paket 1', desc: 'Every word in pack 1 mastered', test: (s, st) => st.mastered >= LEX.length },
+
+  /* --- more to chase: quick wins near the start, a few long hauls --- */
+  { id: 'warm', icon: '✓', name: 'Aufgewärmt', desc: '10 correct answers', test: s => s.correct >= 10 },
+  { id: 'c1000', icon: '◇', name: 'Tausend', desc: '1 000 correct answers', test: s => s.correct >= 1000 },
+  { id: 'q1000', icon: '☷', name: 'Vieltäter', desc: '1 000 questions answered', test: s => s.answers >= 1000 },
+  { id: 'k30', icon: '✷', name: 'Serientäter', desc: '30 right in a row', test: s => s.bestCombo >= 30 },
+  { id: 'k50', icon: '✹', name: 'Unaufhaltsam', desc: '50 right in a row', test: s => s.bestCombo >= 50 },
+  { id: 'reg10', icon: '⌂', name: 'Stammgast', desc: '10 sessions finished', test: s => s.sessions >= 10 },
+  { id: 'vet50', icon: '❂', name: 'Veteran', desc: '50 sessions finished', test: s => s.sessions >= 50 },
+  { id: 'lvl5', icon: '⬟', name: 'Stufe fünf', desc: 'Reach level 5', test: s => levelOf(s.xp).L >= 5 },
+  { id: 'lvl10', icon: '⬢', name: 'Stufe zehn', desc: 'Reach level 10', test: s => levelOf(s.xp).L >= 10 },
+  { id: 'w250', icon: '❖', name: 'Wortschatz', desc: '250 words learned', test: (s, st) => st.learned >= 250 },
+  { id: 'm50', icon: '♛', name: 'Meisterhaft', desc: '50 words mastered', test: (s, st) => st.mastered >= 50 },
+  { id: 'year', icon: '❈', name: 'Vier Jahreszeiten', desc: 'Pass through a full year', test: s => s.answers >= 800 }
 ];
+
+/* One place that hands out any newly-earned badge, with a toast + chime.
+   Called live after every answer and again when a session closes, so a
+   badge can pop the moment it's earned. */
+function awardBadges() {
+  const st = stats();
+  const neu = BADGES.filter(b => !S.badges.includes(b.id) && b.test(S, st));
+  if (neu.length) {
+    neu.forEach(b => S.badges.push(b.id));
+    toast('Abzeichen: ' + neu.map(b => b.name).join(', '));
+    setTimeout(() => KLANG.se('badge'), 300);
+    save();
+  }
+  return neu;
+}
 
 const STATIONS = [
   ['A1', 500], ['A2', 1200], ['B1', 2700], ['B2', 5500], ['C1', 10500], ['C2', 21000]
@@ -3229,6 +3261,8 @@ function judge(given, btn) {
   $('#btnHint').classList.add('hide');
   $('#dCombo').textContent = s.combo >= 3 ? '⚡ ×' + s.combo : '';
   paintProg(); paintHeader(); save();
+  awardBadges();
+  if (window.Season) Season.apply(S.answers, { toast: toast, se: KLANG.se });
   setTimeout(() => $('#btnNext').focus(), 30);
 }
 
@@ -3241,8 +3275,7 @@ function endSession() {
   S.lastDay = t;
   S.last = { plan: PLANS.find(p => p.id === S.plan).name, score: s.right, total: s.q.length, ago: 'just now', day: t };
 
-  const newB = BADGES.filter(b => !S.badges.includes(b.id) && b.test(S, stats()));
-  newB.forEach(b => S.badges.push(b.id));
+  const newB = awardBadges();
   save(true);
 
   $('#sessionRun').classList.add('hide'); $('#sessionEnd').classList.remove('hide');
@@ -3259,7 +3292,6 @@ function endSession() {
     s.wrong.slice(0, 12).map(d => `<button class="wi" data-i="${d.idx}"><span><span class="de">${esc(d.w.de)}</span><br><span class="en">${esc(d.w.en)}</span></span><span class="bx">${d.tag}</span></button>`).join('') + `</div>`
     : `<p class="muted">Nothing missed.</p>`;
   $$('#endMissed .wi').forEach(b => b.onclick = () => openWord(+b.dataset.i));
-  if (newB.length) { toast('Abzeichen: ' + newB.map(b => b.name).join(', ')); setTimeout(() => KLANG.se('badge'), 850); }
   if (S.sync && S.sync.auto && S.sync.url) syncPush(true);
   paintHeader();
 }
@@ -4457,6 +4489,7 @@ async function boot() {
   setMode(); checkStore(); setInterval(() => { setMode(); checkStore(); }, 2000);
 
   paintHeader(); show('heute');
+  if (window.Season) Season.apply(S.answers || 0, { toast: toast, se: KLANG.se, announce: false });
   if (S.sync && S.sync.auto && S.sync.url) { await syncPull(true); paintHeader(); }
   if (S.last) toast('Welcome back — ' + stats().due + ' items are due');
 }

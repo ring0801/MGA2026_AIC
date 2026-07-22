@@ -503,6 +503,7 @@ body{overflow-x:clip}
 .tore .t s{display:block;text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
   text-transform:uppercase;color:var(--ink-40);margin-top:3px}
 </style>
+<script src="season.js"></script>
 </head>
 <body>
 <header class="top">
@@ -533,6 +534,7 @@ body{overflow-x:clip}
 <section id="v-weg">
 
   <div id="lane">
+    <div style="margin:10px 0 4px"><span data-season-slot></span></div>
     <p class="eyebrow" style="margin-top:10px">Side quest · off the road to C2</p>
     <h1 style="font-family:var(--disp);font-size:34px;margin:2px 0 6px;line-height:1">Der Feldweg <span style="color:var(--ink-40);font-size:20px">· The Farm Lane</span></h1>
     <p class="muted" style="max-width:60ch">The road to C2 runs straight and paved, and everyone on it is in a hurry.
@@ -4020,6 +4022,7 @@ function judge(given, btn) {
   $('#btnHint').classList.add('hide');
   $('#dCombo').textContent = s.combo >= 3 ? '⚡ ×' + s.combo : '';
   paintProg(); paintHeader(); save();
+  if (window.Season) Season.apply(S.answers, { toast: toast, se: KLANG.se });
   setTimeout(() => $('#btnNext').focus(), 30);
 }
 
@@ -4197,6 +4200,7 @@ async function boot() {
   tick(); setInterval(tick, 2000);
 
   paintHeader(); show('weg');
+  if (window.Season) Season.apply(S.answers || 0, { toast: toast, se: KLANG.se, announce: false });
   const g2 = gesamt();
   if (G.sessions) toast('Welcome back — ' + g2.due + ' lesson' + (g2.due === 1 ? '' : 's') + ' due');
   else toast('The lane starts at Liesl\u2019s gate');

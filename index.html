@@ -215,6 +215,7 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
   a.prov:nth-child(5):hover{transform:translateY(8px)}
 }
 </style>
+<script src="season.js"></script>
 </head>
 <body>
 
@@ -233,6 +234,11 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
 <main class="wrap">
 
 <div class="storewarn hide" id="storeWarn"></div>
+
+<section id="seasonSec" style="margin-top:14px">
+  <p class="eyebrow" data-t="seasonEyebrow" style="margin-bottom:6px"></p>
+  <span data-season-slot></span>
+</section>
 
 <div id="resume" class="panel hide" style="border-left:5px solid var(--gelb);margin-top:14px">
   <p class="eyebrow" data-t="resumeEyebrow"></p>
@@ -327,6 +333,7 @@ const T = {
 
     badgesH: 'Badges',
     badgesP: 'Everything you have carried home, from every road and every lane.',
+    seasonEyebrow: 'The turning year · a new season every 200 questions',
 
     footA: 'Saves to', footB: '· no external requests · no ads, ever',
 
@@ -380,6 +387,7 @@ const T = {
 
     badgesH: 'Abzeichen',
     badgesP: 'Alles, was du heimgetragen hast — von jeder Straße und jedem Feldweg.',
+    seasonEyebrow: 'Das wandernde Jahr · alle 200 Fragen ein Wechsel',
 
     footA: 'Speichert in', footB: '· keine externen Anfragen · keine Werbung, nie',
 
@@ -486,7 +494,19 @@ const BADGE_META = {
   ghof: { icon: '★', name: 'Ein Hof', nameEn: 'One farm', desc: 'Ein ganzer Hof gemeistert', descEn: 'One whole farmstead mastered' },
   gall: { icon: '☰', name: 'Alle sechs', nameEn: 'All six', desc: 'Jede Lektion gemeistert', descEn: 'Every grammar lesson mastered' },
   gfreund: { icon: '♥', name: 'Herzensfreundin', nameEn: 'Close friend', desc: 'Eine Freundschaft bei 90', descEn: 'A friendship at 90' },
-  gkombo: { icon: '⚡', name: 'Kombo', nameEn: 'Combo', desc: '20 richtig in Folge', descEn: '20 grammar answers in a row' }
+  gkombo: { icon: '⚡', name: 'Kombo', nameEn: 'Combo', desc: '20 richtig in Folge', descEn: '20 grammar answers in a row' },
+  warm: { icon: '✓', name: 'Aufgewärmt', nameEn: 'Warmed up', desc: '10 richtige Antworten', descEn: '10 correct answers' },
+  c1000: { icon: '◇', name: 'Tausend', nameEn: 'Thousand', desc: '1 000 richtige Antworten', descEn: '1,000 correct answers' },
+  q1000: { icon: '☷', name: 'Vieltäter', nameEn: 'Busy', desc: '1 000 Fragen beantwortet', descEn: '1,000 questions answered' },
+  k30: { icon: '✷', name: 'Serientäter', nameEn: 'On a roll', desc: '30 richtig in Folge', descEn: '30 right in a row' },
+  k50: { icon: '✹', name: 'Unaufhaltsam', nameEn: 'Unstoppable', desc: '50 richtig in Folge', descEn: '50 right in a row' },
+  reg10: { icon: '⌂', name: 'Stammgast', nameEn: 'Regular', desc: '10 Sitzungen beendet', descEn: '10 sessions finished' },
+  vet50: { icon: '❂', name: 'Veteran', nameEn: 'Veteran', desc: '50 Sitzungen beendet', descEn: '50 sessions finished' },
+  lvl5: { icon: '⬟', name: 'Stufe fünf', nameEn: 'Level five', desc: 'Stufe 5 erreicht', descEn: 'Reached level 5' },
+  lvl10: { icon: '⬢', name: 'Stufe zehn', nameEn: 'Level ten', desc: 'Stufe 10 erreicht', descEn: 'Reached level 10' },
+  w250: { icon: '❖', name: 'Wortschatz', nameEn: 'Vocabulary', desc: '250 Wörter gelernt', descEn: '250 words learned' },
+  m50: { icon: '♛', name: 'Meisterhaft', nameEn: 'Masterful', desc: '50 Wörter gemeistert', descEn: '50 words mastered' },
+  year: { icon: '❈', name: 'Vier Jahreszeiten', nameEn: 'Four seasons', desc: 'Ein ganzes Jahr durchlaufen', descEn: 'Passed through a full year' }
 };
 function badgeName(m) { return (LANG === 'en' && m.nameEn) ? m.nameEn : m.name; }
 function badgeDesc(m) { return (LANG === 'en' && m.descEn) ? m.descEn : m.desc; }
@@ -1150,6 +1170,7 @@ function render() {
   paintPacks(packs);
   paintFeldweg(DATA.gram);
   paintBadges(DATA.profile.badges);
+  if (window.Season) Season.apply(DATA.profile.answers || 0, { announce: false });
   const modeTxt = { account: t('storeAccount'), device: t('storeDevice'), memory: t('storeMemory') };
   document.getElementById('storeMode').textContent = modeTxt[STORE_MODE] || modeTxt.device;
   const warn = document.getElementById('storeWarn');
