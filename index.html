@@ -588,6 +588,7 @@ const PROVINZ = [
   { pack: 'p6', code: 'C2', land: 'Krone', col: '#CE3B2B', her: 'Friederike' }
 ];
 const SCHLAF = 40;
+const RUHE = 3;
 const stufeName = i => t('stufen')[i] || '';
 const E12 = '............';
 const STAGE = [
@@ -760,9 +761,21 @@ function paintReich(profile, packs) {
     };
   };
 
+  /* The exact rule a pack uses (paket*.html → schlaeft): a province sleeps
+     because you have been away, not because a backlog is large. One finished
+     run stamps R.wach[pack] = today() and wakes her; after that she only lies
+     back down once RUHE days have passed AND a real backlog rebuilt. Reading
+     the same shared registry here keeps the hub in step with the pack. */
+  const schlaeft = (p, st) => {
+    if (!st || !st.built) return false;
+    const w = (R.wach && R.wach[p.pack]) || 0;
+    if (!w) return st.due >= SCHLAF;
+    return (today() - w) >= RUHE && st.due >= 20;
+  };
+
   /* the court line — whoever you are currently keeping company */
   const tp = PROVINZ.find(p => p.pack === (R.tend || 'p1')) || PROVINZ[0];
-  const ts = read(tp), tsl = ts.due >= SCHLAF, tst = stufeOf(ts.learned, ts.total);
+  const ts = read(tp), tsl = schlaeft(tp, ts), tst = stufeOf(ts.learned, ts.total);
   const anyBuilt = PROVINZ.some(p => read(p).built);
   document.getElementById('hofLine').innerHTML =
     '<div class="hofher">' + spriteSVG(tst, tp.col, { px: 7, sleep: tsl, worn: kleid[tp.pack] || [] }) + '</div>' +
@@ -775,7 +788,7 @@ function paintReich(profile, packs) {
 
   /* the map */
   document.getElementById('reichKarte').innerHTML = PROVINZ.map(p => {
-    const st = read(p), sl = st.built && st.due >= SCHLAF, stu = stufeOf(st.learned, st.total);
+    const st = read(p), sl = schlaeft(p, st), stu = stufeOf(st.learned, st.total);
     const pct = st.total ? Math.min(100, Math.round(100 * st.learned / st.total)) : 0;
     const file = fileOf(p.pack);
     const scene = st.built ? sceneSVG(p.col, {
