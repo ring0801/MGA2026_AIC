@@ -108,7 +108,7 @@ h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:upp
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
 .badge{border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:10px 8px;text-align:center;opacity:.4}
 .badge.got{opacity:1;border-color:var(--gelb);background:#FDF4E0}
-.badge b{display:block;font-family:var(--disp);font-size:14px;text-transform:uppercase;letter-spacing:.03em;line-height:1.1}
+.badge b{display:block;font-family:var(--disp);font-size:14px;text-transform:uppercase;letter-spacing:.03em;line-height:1.1;overflow-wrap:break-word;word-break:break-word}
 .badge s{display:block;text-decoration:none;font-size:10px;color:var(--ink-60);margin-top:3px;line-height:1.2}
 .badge em{font-style:normal;font-size:19px;display:block;margin-bottom:3px}
 
@@ -329,11 +329,11 @@ const T = {
 
     sideH: 'The side path',
     sideP1: 'The main road is paved and everyone on it is in a hurry. But there is a gap in the hedge past the last milestone, and beyond it a rutted lane winds off between the fields.',
-    sideP2: 'No princess lives down there. Six girls work six farms, and between them they hold every rule of German grammar the way you hold a tool you use daily.',
+    sideP2: 'Six girls work six farms, and between them they hold every rule of German grammar the way you hold a tool you use daily.',
 
     badgesH: 'Badges',
     badgesP: 'Everything you have carried home, from every road and every lane.',
-    seasonEyebrow: 'The turning year · a new season every 200 questions',
+    seasonEyebrow: 'The turning year',
 
     footA: 'Saves to', footB: '· no external requests · no ads, ever',
 
@@ -353,7 +353,7 @@ const T = {
     continue: 'Continue →',
 
     sideId: 'SIDE PATH', sideName: 'Der Feldweg · The Farm Lane',
-    sideCard: 'Six farmsteads, six working girls, {n} lessons of German grammar. No vocabulary, no separate score — the same streak, the same level.',
+    sideCard: 'Six farmsteads, six working girls, {n} lessons of German grammar — all on the same streak and the same level as the road.',
     sideDue: '{n} due', sideOpen: 'open',
     sideMeta: '{a} / {b} lessons mastered', closeness: 'closeness {n}%',
 
@@ -383,11 +383,11 @@ const T = {
 
     sideH: 'Der Nebenpfad',
     sideP1: 'Die Hauptstraße ist gepflastert, und alle darauf haben es eilig. Aber hinter dem letzten Meilenstein ist eine Lücke in der Hecke, und dahinter windet sich ein Feldweg zwischen die Äcker.',
-    sideP2: 'Dort unten wohnt keine Prinzessin. Sechs Mädchen bewirtschaften sechs Höfe, und zusammen halten sie jede Regel der deutschen Grammatik so in der Hand wie ein Werkzeug, das man täglich benutzt.',
+    sideP2: 'Sechs Mädchen bewirtschaften sechs Höfe, und zusammen halten sie jede Regel der deutschen Grammatik so in der Hand wie ein Werkzeug, das man täglich benutzt.',
 
     badgesH: 'Abzeichen',
     badgesP: 'Alles, was du heimgetragen hast — von jeder Straße und jedem Feldweg.',
-    seasonEyebrow: 'Das wandernde Jahr · alle 200 Fragen ein Wechsel',
+    seasonEyebrow: 'Das wandernde Jahr',
 
     footA: 'Speichert in', footB: '· keine externen Anfragen · keine Werbung, nie',
 
@@ -407,7 +407,7 @@ const T = {
     continue: 'Weiter →',
 
     sideId: 'NEBENPFAD', sideName: 'Der Feldweg',
-    sideCard: 'Sechs Höfe, sechs Mädchen, die arbeiten, {n} Lektionen deutscher Grammatik. Kein Wortschatz, kein eigener Punktestand — dieselbe Serie, dieselbe Stufe.',
+    sideCard: 'Sechs Höfe, sechs Mädchen, die arbeiten, {n} Lektionen deutscher Grammatik — dieselbe Serie und dieselbe Stufe wie auf der Straße.',
     sideDue: '{n} fällig', sideOpen: 'öffnen',
     sideMeta: '{a} / {b} Lektionen gemeistert', closeness: 'Nähe {n}%',
 
@@ -478,35 +478,40 @@ const RANKS = [
   ['Sprachgewalt', 'force of language']
 ];
 
+/* Same journey the Paket lays out — first steps, accuracy, volume, combos,
+   the daily habit, sessions, levels, vocabulary, mastery, the long haul —
+   with the Feldweg's own badges gathered after, as their own cluster. */
 const BADGE_META = {
+  // the road
   start: { icon: '⚑', name: 'Anfang', nameEn: 'First step', desc: 'Eine Sitzung beenden', descEn: 'Finish one session' },
+  warm: { icon: '✓', name: 'Aufgewärmt', nameEn: 'Warmed up', desc: '10 richtige Antworten', descEn: '10 correct answers' },
   c100: { icon: '✦', name: 'Hundert', nameEn: 'Hundred', desc: '100 richtige Antworten', descEn: '100 correct answers' },
   c500: { icon: '▲', name: 'Fünfhundert', nameEn: 'Five hundred', desc: '500 richtige Antworten', descEn: '500 correct answers' },
+  c1000: { icon: '◇', name: 'Tausend', nameEn: 'Thousand', desc: '1 000 richtige Antworten', descEn: '1,000 correct answers' },
   c2000: { icon: '☰', name: 'Zweitausend', nameEn: 'Two thousand', desc: '2 000 richtige Antworten', descEn: '2,000 correct answers' },
+  q1000: { icon: '☷', name: 'Vieltäter', nameEn: 'Busy', desc: '1 000 Fragen beantwortet', descEn: '1,000 questions answered' },
+  k15: { icon: '⚡', name: 'Kombo', nameEn: 'Combo', desc: '15 richtig in Folge', descEn: '15 right in a row' },
+  k30: { icon: '✷', name: 'Serientäter', nameEn: 'On a roll', desc: '30 richtig in Folge', descEn: '30 right in a row' },
+  k50: { icon: '✹', name: 'Furios', nameEn: 'Unstoppable', desc: '50 richtig in Folge', descEn: '50 right in a row' },
   s7: { icon: '☼', name: 'Sieben', nameEn: 'Seven', desc: '7 Tage in Folge', descEn: '7-day streak' },
   s30: { icon: '⟲', name: 'Dreißig', nameEn: 'Thirty', desc: '30 Tage in Folge', descEn: '30-day streak' },
-  k15: { icon: '⚡', name: 'Kombo', nameEn: 'Combo', desc: '15 richtig in Folge', descEn: '15 right in a row' },
-  w100: { icon: '◆', name: 'Hundert Wörter', nameEn: 'Hundred words', desc: '100 Wörter gelernt', descEn: '100 words learned' },
-  w500: { icon: '◈', name: 'A2-Schwelle', nameEn: 'A2 threshold', desc: '500 Wörter gelernt', descEn: '500 words learned' },
-  gstart: { icon: '🌾', name: 'Feldweg', nameEn: 'The Lane', desc: 'Eine Runde auf dem Feldweg', descEn: 'One round on the farm lane' },
-  g100: { icon: '✦', name: 'Hundert', nameEn: 'Hundred', desc: '100 Grammatikaufgaben richtig', descEn: '100 grammar answers right' },
-  g500: { icon: '▲', name: 'Fünfhundert', nameEn: 'Five hundred', desc: '500 Grammatikaufgaben richtig', descEn: '500 grammar answers right' },
-  ghof: { icon: '★', name: 'Ein Hof', nameEn: 'One farm', desc: 'Ein ganzer Hof gemeistert', descEn: 'One whole farmstead mastered' },
-  gall: { icon: '☰', name: 'Alle sechs', nameEn: 'All six', desc: 'Jede Lektion gemeistert', descEn: 'Every grammar lesson mastered' },
-  gfreund: { icon: '♥', name: 'Herzensfreundin', nameEn: 'Close friend', desc: 'Eine Freundschaft bei 90', descEn: 'A friendship at 90' },
-  gkombo: { icon: '⚡', name: 'Kombo', nameEn: 'Combo', desc: '20 richtig in Folge', descEn: '20 grammar answers in a row' },
-  warm: { icon: '✓', name: 'Aufgewärmt', nameEn: 'Warmed up', desc: '10 richtige Antworten', descEn: '10 correct answers' },
-  c1000: { icon: '◇', name: 'Tausend', nameEn: 'Thousand', desc: '1 000 richtige Antworten', descEn: '1,000 correct answers' },
-  q1000: { icon: '☷', name: 'Vieltäter', nameEn: 'Busy', desc: '1 000 Fragen beantwortet', descEn: '1,000 questions answered' },
-  k30: { icon: '✷', name: 'Serientäter', nameEn: 'On a roll', desc: '30 richtig in Folge', descEn: '30 right in a row' },
-  k50: { icon: '✹', name: 'Unaufhaltsam', nameEn: 'Unstoppable', desc: '50 richtig in Folge', descEn: '50 right in a row' },
   reg10: { icon: '⌂', name: 'Stammgast', nameEn: 'Regular', desc: '10 Sitzungen beendet', descEn: '10 sessions finished' },
   vet50: { icon: '❂', name: 'Veteran', nameEn: 'Veteran', desc: '50 Sitzungen beendet', descEn: '50 sessions finished' },
   lvl5: { icon: '⬟', name: 'Stufe fünf', nameEn: 'Level five', desc: 'Stufe 5 erreicht', descEn: 'Reached level 5' },
   lvl10: { icon: '⬢', name: 'Stufe zehn', nameEn: 'Level ten', desc: 'Stufe 10 erreicht', descEn: 'Reached level 10' },
+  w100: { icon: '◆', name: 'Hundert Wörter', nameEn: 'Hundred words', desc: '100 Wörter gelernt', descEn: '100 words learned' },
   w250: { icon: '❖', name: 'Wortschatz', nameEn: 'Vocabulary', desc: '250 Wörter gelernt', descEn: '250 words learned' },
+  w500: { icon: '◈', name: 'A2-Schwelle', nameEn: 'A2 threshold', desc: '500 Wörter gelernt', descEn: '500 words learned' },
   m50: { icon: '♛', name: 'Meisterhaft', nameEn: 'Masterful', desc: '50 Wörter gemeistert', descEn: '50 words mastered' },
-  year: { icon: '❈', name: 'Vier Jahreszeiten', nameEn: 'Four seasons', desc: 'Ein ganzes Jahr durchlaufen', descEn: 'Passed through a full year' }
+  year: { icon: '❈', name: 'Vier Jahreszeiten', nameEn: 'Four seasons', desc: 'Ein ganzes Jahr durchlaufen', descEn: 'Passed through a full year' },
+  // the lane
+  gstart: { icon: '🌾', name: 'Feldweg', nameEn: 'The Lane', desc: 'Eine Runde auf dem Feldweg', descEn: 'One round on the farm lane' },
+  g100: { icon: '✦', name: 'Hundert', nameEn: 'Hundred', desc: '100 Grammatikaufgaben richtig', descEn: '100 grammar answers right' },
+  g500: { icon: '▲', name: 'Fünfhundert', nameEn: 'Five hundred', desc: '500 Grammatikaufgaben richtig', descEn: '500 grammar answers right' },
+  gkombo: { icon: '⚡', name: 'Kombo', nameEn: 'Combo', desc: '20 richtig in Folge', descEn: '20 grammar answers in a row' },
+  gfreund: { icon: '♥', name: 'Herzensfreundin', nameEn: 'Close friend', desc: 'Eine Freundschaft bei 90', descEn: 'A friendship at 90' },
+  ghof: { icon: '★', name: 'Ein Hof', nameEn: 'One farm', desc: 'Ein ganzer Hof gemeistert', descEn: 'One whole farmstead mastered' },
+  gall: { icon: '☰', name: 'Alle sechs', nameEn: 'All six', desc: 'Jede Lektion gemeistert', descEn: 'Every grammar lesson mastered' }
 };
 function badgeName(m) { return (LANG === 'en' && m.nameEn) ? m.nameEn : m.name; }
 function badgeDesc(m) { return (LANG === 'en' && m.descEn) ? m.descEn : m.desc; }

@@ -226,7 +226,7 @@ details.acc .in{padding:0 13px 13px}
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
 .badge{border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:10px 8px;text-align:center;opacity:.4}
 .badge.got{opacity:1;border-color:var(--gelb);background:#FDF4E0}
-.badge b{display:block;font-family:var(--disp);font-size:15px;text-transform:uppercase;letter-spacing:.04em;line-height:1.1}
+.badge b{display:block;font-family:var(--disp);font-size:15px;text-transform:uppercase;letter-spacing:.04em;line-height:1.1;overflow-wrap:break-word;word-break:break-word}
 .badge s{display:block;text-decoration:none;font-size:10.5px;color:var(--ink-60);margin-top:3px;line-height:1.25}
 .badge em{font-style:normal;font-size:20px;display:block;margin-bottom:3px}
 
@@ -2948,30 +2948,41 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => (s + '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+/* Ordered as a journey, not a heap: first steps, then accuracy, volume,
+   combos, the daily habit, sessions, levels, vocabulary, mastery, and the
+   long haul last. Each cluster climbs from easy to hard. */
 const BADGES = [
+  // first steps
   { id: 'start', icon: '⚑', name: 'Anfang', desc: 'Finish one session', test: s => s.sessions >= 1 },
+  { id: 'warm', icon: '✓', name: 'Aufgewärmt', desc: '10 correct answers', test: s => s.correct >= 10 },
+  // correct answers
   { id: 'c100', icon: '✦', name: 'Hundert', desc: '100 correct answers', test: s => s.correct >= 100 },
   { id: 'c500', icon: '▲', name: 'Fünfhundert', desc: '500 correct answers', test: s => s.correct >= 500 },
+  { id: 'c1000', icon: '◇', name: 'Tausend', desc: '1 000 correct answers', test: s => s.correct >= 1000 },
   { id: 'c2000', icon: '☰', name: 'Zweitausend', desc: '2 000 correct answers', test: s => s.correct >= 2000 },
+  // questions faced
+  { id: 'q1000', icon: '☷', name: 'Vieltäter', desc: '1 000 questions answered', test: s => s.answers >= 1000 },
+  // combos
+  { id: 'k15', icon: '⚡', name: 'Kombo', desc: '15 right in a row', test: s => s.bestCombo >= 15 },
+  { id: 'k30', icon: '✷', name: 'Serientäter', desc: '30 right in a row', test: s => s.bestCombo >= 30 },
+  { id: 'k50', icon: '✹', name: 'Furios', desc: '50 right in a row', test: s => s.bestCombo >= 50 },
+  // the daily habit
   { id: 's7', icon: '☼', name: 'Sieben', desc: '7-day streak', test: s => s.streak >= 7 },
   { id: 's30', icon: '⟲', name: 'Dreißig', desc: '30-day streak', test: s => s.streak >= 30 },
-  { id: 'k15', icon: '⚡', name: 'Kombo', desc: '15 right in a row', test: s => s.bestCombo >= 15 },
-  { id: 'w100', icon: '◆', name: 'Hundert Wörter', desc: '100 words learned', test: (s, st) => st.learned >= 100 },
-  { id: 'w500', icon: '◈', name: 'A2-Schwelle', desc: '500 words learned', test: (s, st) => st.learned >= 500 },
-  { id: 'pack1', icon: '★', name: 'Paket 1', desc: 'Every word in pack 1 mastered', test: (s, st) => st.mastered >= LEX.length },
-
-  /* --- more to chase: quick wins near the start, a few long hauls --- */
-  { id: 'warm', icon: '✓', name: 'Aufgewärmt', desc: '10 correct answers', test: s => s.correct >= 10 },
-  { id: 'c1000', icon: '◇', name: 'Tausend', desc: '1 000 correct answers', test: s => s.correct >= 1000 },
-  { id: 'q1000', icon: '☷', name: 'Vieltäter', desc: '1 000 questions answered', test: s => s.answers >= 1000 },
-  { id: 'k30', icon: '✷', name: 'Serientäter', desc: '30 right in a row', test: s => s.bestCombo >= 30 },
-  { id: 'k50', icon: '✹', name: 'Unaufhaltsam', desc: '50 right in a row', test: s => s.bestCombo >= 50 },
+  // sessions
   { id: 'reg10', icon: '⌂', name: 'Stammgast', desc: '10 sessions finished', test: s => s.sessions >= 10 },
   { id: 'vet50', icon: '❂', name: 'Veteran', desc: '50 sessions finished', test: s => s.sessions >= 50 },
+  // levels
   { id: 'lvl5', icon: '⬟', name: 'Stufe fünf', desc: 'Reach level 5', test: s => levelOf(s.xp).L >= 5 },
   { id: 'lvl10', icon: '⬢', name: 'Stufe zehn', desc: 'Reach level 10', test: s => levelOf(s.xp).L >= 10 },
+  // vocabulary
+  { id: 'w100', icon: '◆', name: 'Hundert Wörter', desc: '100 words learned', test: (s, st) => st.learned >= 100 },
   { id: 'w250', icon: '❖', name: 'Wortschatz', desc: '250 words learned', test: (s, st) => st.learned >= 250 },
+  { id: 'w500', icon: '◈', name: 'A2-Schwelle', desc: '500 words learned', test: (s, st) => st.learned >= 500 },
+  // mastery
   { id: 'm50', icon: '♛', name: 'Meisterhaft', desc: '50 words mastered', test: (s, st) => st.mastered >= 50 },
+  { id: 'pack1', icon: '★', name: 'Paket 1', desc: 'Every word in pack 1 mastered', test: (s, st) => st.mastered >= LEX.length },
+  // the long haul
   { id: 'year', icon: '❈', name: 'Vier Jahreszeiten', desc: 'Pass through a full year', test: s => s.answers >= 800 }
 ];
 
