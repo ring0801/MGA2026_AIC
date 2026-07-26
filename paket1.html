@@ -2374,6 +2374,8 @@ const RANKS = RANK_RAW.trim().split('\n').map(l => l.split('|'));
 /* ---------- 3.2 grammar ---------- */
 const PRON = ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'sie/Sie'];
 const WEAK_N = new Set(['Mensch', 'Junge', 'Kollege', 'Nachbar', 'Kunde', 'Student', 'Bär', 'Gedanke']);
+/* Loanwords / names that take genitive -s (not -es) despite a consonant ending. */
+const GEN_S = new Set(['Chef', 'Job', 'Bus', 'Film', 'Park', 'Hotel', 'Sport', 'Test', 'Club', 'Auto', 'Radio', 'Kino']);
 const INSEP = /^(be|emp|ent|er|ge|miss|ver|zer|über|unter|wider)/;
 
 const G = {
@@ -2481,8 +2483,14 @@ const G = {
     let f = w.de;
     if (WEAK_N.has(w.de) && k > 0) f = w.pl === w.de + 'n' ? w.de + 'n' : w.de + 'en';
     if (WEAK_N.has(w.de) && k === 3) f += (w.de === 'Gedanke' ? 's' : '');
-    else if (!WEAK_N.has(w.de) && k === 3 && (w.g === 'm' || w.g === 'n'))
-      f += (/[sßxz]$/.test(f) || f.length <= 5) ? 'es' : 's';
+    else if (!WEAK_N.has(w.de) && k === 3 && (w.g === 'm' || w.g === 'n')) {
+      const grp = (f.match(/[aeiouäöü]+/gi) || []).length;
+      f += GEN_S.has(f) ? 's'                                   // Auto → Autos
+        : /[aeiouäöüy]$/i.test(f) ? 's'                         // Käse → Käses, Büro → Büros
+        : (grp >= 2 && /(el|er|en|em)$/i.test(f)) ? 's'         // Apfel → Apfels, Regen → Regens
+        : /[sßxz]$/i.test(f) ? 'es'                             // Glas → Glases
+        : grp <= 1 ? 'es' : 's';                                // Mann → Mannes, Problem → Problems
+    }
     return f;
   },
   nounPhrase(w, k, plural) { return G.artikel(w.g, k, plural) + ' ' + G.nounForm(w, k, plural); },
@@ -2747,14 +2755,14 @@ function skillsFor(w) {
   if (w.pos === 'n') s.push('g', 'pl', 'k');
   if (w.pos === 'v') s.push('c', 'pt', 'kj');
   if (w.pos === 'adj') s.push('cp', 'ad');
-  if (w.pos === 'prep') s.push('pr');
+  if (w.pos === 'prep') s.push('pr', 'pa');
   if (w.pos === 'conj') s.push('wo');
   return s;
 }
 const SKILL_NAME = {
   m: 'MEANING', p: 'PRODUCE', g: 'GENDER', pl: 'PLURAL', k: 'CASE',
   c: 'CONJUGATE', pt: 'PARTICIPLE', kj: 'SUBJUNCTIVE', cp: 'COMPARE',
-  ad: 'ADJ ENDING', pr: 'PREP CASE', wo: 'WORD ORDER'
+  ad: 'ADJ ENDING', pr: 'PREP CASE', pa: 'PREP FORM', wo: 'WORD ORDER'
 };
 const PLANS = [
   { id: 'mix', name: 'Auto-Mix', desc: 'Whatever the scheduler says is ripe. The default.', sk: null },
@@ -2762,7 +2770,7 @@ const PLANS = [
   { id: 'nomen', name: 'Der Die Das', desc: 'Gender, plural, and the four cases.', sk: ['g', 'pl', 'k'] },
   { id: 'verb', name: 'Verb forge', desc: 'Nine tenses, participles, Konjunktiv.', sk: ['c', 'pt', 'kj'] },
   { id: 'adj', name: 'Adjective lab', desc: 'Comparatives and the ending tables.', sk: ['cp', 'ad'] },
-  { id: 'glue', name: 'Glue words', desc: 'Prepositions, cases they take, word order.', sk: ['pr', 'wo'] }
+  { id: 'glue', name: 'Glue words', desc: 'Prepositions, cases they take, word order.', sk: ['pr', 'pa', 'wo'] }
 ];
 /* ============================================================
    4. DRILL GENERATORS
@@ -2784,6 +2792,71 @@ function distractors(w, n, field) {
   const src = shuffle(pool.length >= n ? pool : wide);
   for (const c of src) { if (picks.length >= n) break; if (!picks.some(p => p[field] === c[field])) picks.push(c); }
   return picks.map(p => p[field]);
+}
+
+/* ---- Sensible pairings for the context drills -------------------------------
+   The prep-application ('pa') and adjective-ending ('ad') drills need a noun to
+   put in context. Drawing from the full lexicon produces nonsense ("in dem Hund",
+   "das salzige Fenster"). Instead we draw from a small, tagged pool of common,
+   strong (clean-genitive) nouns, and each preposition / adjective only pulls the
+   nouns whose tags fit it. Tags: per(son) ani(mal) loc(ation) cont(ainer)
+   surf(ace) top(=horizontal surface) vert(=vertical surface) obj(ect) food time
+   cause abs(tract). A noun can carry several. */
+const POOL = [
+  ['Mann', 'man', 'm', 'per'], ['Frau', 'woman', 'f', 'per'], ['Kind', 'child', 'n', 'per'],
+  ['Freund', 'friend', 'm', 'per'], ['Arzt', 'doctor', 'm', 'per'], ['Lehrer', 'teacher', 'm', 'per'], ['Gast', 'guest', 'm', 'per'],
+  ['Hund', 'dog', 'm', 'ani'], ['Katze', 'cat', 'f', 'ani'], ['Pferd', 'horse', 'n', 'ani'], ['Vogel', 'bird', 'm', 'ani'],
+  ['Haus', 'house', 'n', 'loc cont'], ['Wohnung', 'flat', 'f', 'loc cont'], ['Küche', 'kitchen', 'f', 'loc cont'],
+  ['Zimmer', 'room', 'n', 'loc cont'], ['Garten', 'garden', 'm', 'loc'], ['Büro', 'office', 'n', 'loc cont'],
+  ['Stadt', 'city', 'f', 'loc'], ['Wald', 'forest', 'm', 'loc'], ['Restaurant', 'restaurant', 'n', 'loc cont'],
+  ['Straße', 'street', 'f', 'loc top'], ['Bahnhof', 'station', 'm', 'loc'],
+  ['Tisch', 'table', 'm', 'top surf'], ['Stuhl', 'chair', 'm', 'top surf'], ['Bett', 'bed', 'n', 'top surf'],
+  ['Boden', 'floor', 'm', 'top surf'], ['Dach', 'roof', 'n', 'top surf'], ['Regal', 'shelf', 'n', 'top surf'],
+  ['Wand', 'wall', 'f', 'vert surf'], ['Tür', 'door', 'f', 'vert surf loc'], ['Fenster', 'window', 'n', 'vert surf'],
+  ['Schrank', 'cupboard', 'm', 'top surf cont obj'],
+  ['Buch', 'book', 'n', 'obj'], ['Schlüssel', 'key', 'm', 'obj'], ['Handy', 'phone', 'n', 'obj'], ['Koffer', 'suitcase', 'm', 'obj cont'],
+  ['Messer', 'knife', 'n', 'obj'], ['Glas', 'glass', 'n', 'obj cont'], ['Jacke', 'jacket', 'f', 'obj'], ['Mantel', 'coat', 'm', 'obj'],
+  ['Auto', 'car', 'n', 'obj cont loc'], ['Ball', 'ball', 'm', 'obj'], ['Flasche', 'bottle', 'f', 'obj cont'], ['Tasche', 'bag', 'f', 'obj cont'],
+  ['Apfel', 'apple', 'm', 'food'], ['Suppe', 'soup', 'f', 'food'], ['Brot', 'bread', 'n', 'food'], ['Käse', 'cheese', 'm', 'food'],
+  ['Kaffee', 'coffee', 'm', 'food'], ['Salat', 'salad', 'm', 'food'], ['Bier', 'beer', 'n', 'food'], ['Ei', 'egg', 'n', 'food'],
+  ['Tag', 'day', 'm', 'time'], ['Woche', 'week', 'f', 'time'], ['Monat', 'month', 'm', 'time'], ['Jahr', 'year', 'n', 'time'],
+  ['Morgen', 'morning', 'm', 'time'], ['Abend', 'evening', 'm', 'time'], ['Stunde', 'hour', 'f', 'time'],
+  ['Regen', 'rain', 'm', 'cause'], ['Sturm', 'storm', 'm', 'cause'], ['Wetter', 'weather', 'n', 'cause'],
+  ['Prüfung', 'exam', 'f', 'cause abs'], ['Krankheit', 'illness', 'f', 'cause'], ['Unfall', 'accident', 'm', 'cause'],
+  ['Idee', 'idea', 'f', 'abs'], ['Frage', 'question', 'f', 'abs'], ['Problem', 'problem', 'n', 'abs'], ['Plan', 'plan', 'm', 'abs'],
+  ['Grund', 'reason', 'm', 'abs cause'], ['Meinung', 'opinion', 'f', 'abs'], ['Regel', 'rule', 'f', 'abs'], ['Lösung', 'solution', 'f', 'abs']
+].map(([de, en, g, t]) => ({ de, en, g, pl: de, t: t.split(' ') }));
+
+/* Which pool tags each preposition may draw from. Anything unlisted (für, mit,
+   ohne, gegen…) falls back to plain concrete nouns — all of which read fine. */
+const PREP_FIT = {
+  in: ['loc', 'cont'], an: ['vert', 'loc'], auf: ['top'], 'über': ['top'], unter: ['top'],
+  vor: ['surf', 'loc'], hinter: ['surf', 'loc'], neben: ['surf', 'loc', 'obj'], zwischen: ['surf', 'loc'],
+  durch: ['loc'], um: ['loc', 'top'], entlang: ['loc'], gegen: ['vert', 'top', 'obj', 'per'],
+  zu: ['per', 'loc'], nach: ['loc', 'time'], aus: ['loc', 'cont'], bei: ['per', 'loc'],
+  von: ['per', 'loc', 'obj'], 'gegenüber': ['loc', 'per'], seit: ['time'], ab: ['time', 'loc'], bis: ['time', 'loc'],
+  'während': ['time', 'cause', 'abs'], wegen: ['cause', 'abs', 'per', 'obj'], trotz: ['cause', 'abs'],
+  statt: ['obj', 'per', 'food'], innerhalb: ['time', 'loc'], 'außerhalb': ['loc', 'time'], aufgrund: ['cause', 'abs'],
+  hinsichtlich: ['abs', 'cause'], mittels: ['obj'], angesichts: ['cause', 'abs'], 'gemäß': ['abs', 'cause'],
+  laut: ['abs', 'cause'], entgegen: ['abs'], 'außer': ['per', 'obj']
+};
+
+/* Adjectives that only make sense with certain nouns. Everything else pairs with
+   any concrete noun. */
+const ADJ_FIT = (() => {
+  const m = {};
+  const put = (tags, list) => list.split(' ').forEach(w => m[w] = tags);
+  put(['food'], 'süß salzig sauer bitter scharf');
+  put(['per', 'ani'], 'müde wach hungrig durstig satt krank gesund verletzt schwanger nett freundlich höflich unhöflich klug dumm fleißig faul ehrlich mutig ruhig nervös geduldig stolz bescheiden großzügig neugierig zuverlässig selbstbewusst glücklich traurig froh zufrieden unzufrieden wütend ängstlich wild zahm');
+  put(['obj'], 'rot blau grün gelb schwarz weiß grau braun rosa orange lila bunt rund eckig gerade krumm flach spitz glatt rau');
+  put(['obj', 'loc'], 'voll leer offen geschlossen besetzt nass trocken sauber schmutzig hell dunkel');
+  put(['abs'], 'wichtig unwichtig nötig möglich unmöglich wahrscheinlich rechtlich gesetzlich politisch wirtschaftlich sozial national international öffentlich privat allgemein konkret abstrakt endgültig vorläufig');
+  return m;
+})();
+
+function poolPick(tags) {
+  const fit = POOL.filter(n => n.t.some(t => tags.includes(t)));
+  return rnd(fit.length ? fit : POOL);
 }
 
 function makeDrill(idx, skill) {
@@ -2894,7 +2967,7 @@ function makeDrill(idx, skill) {
       break;
     }
     case 'ad': {
-      const noun = rnd(LEX.filter(x => x.pos === 'n'));
+      const noun = poolPick(ADJ_FIT[w.de] || ['per', 'ani', 'obj', 'loc']);
       const type = rnd(['schwach', 'gemischt', 'stark']);
       const k = Math.floor(Math.random() * 4);
       const pl = false;
@@ -2921,6 +2994,36 @@ function makeDrill(idx, skill) {
       d.answer = { 'Akk': 'Akkusativ', 'Dat': 'Dativ', 'Gen': 'Genitiv', 'Dat/Akk': 'Dativ oder Akkusativ' }[w.x];
       d.ex = w.ex; d.exEn = w.exEn;
       d.why = w.x === 'Dat/Akk' ? 'A <b>Wechselpräposition</b>: Akkusativ for movement into a place (wohin?), Dativ for location (wo?).' : 'Means: ' + w.en;
+      break;
+    }
+    case 'pa': {
+      // Practical counterpart to 'pr': don't just name the case — apply it by
+      // supplying the article. Two-way prepositions get a wo?/wohin? cue so the
+      // Dativ/Akkusativ choice is decidable.
+      let k, cue = '';
+      if (w.x === 'Akk') k = 1;
+      else if (w.x === 'Dat') k = 2;
+      else if (w.x === 'Gen') k = 3;
+      else { const wohin = Math.random() < 0.5; k = wohin ? 1 : 2; cue = wohin ? '  · wohin?' : '  · wo?'; }
+      const noun = poolPick(PREP_FIT[w.de] || ['per', 'ani', 'obj']);
+      const art = G.artikel(noun.g, k, false);
+      d.ask = 'Fill the gap — which article does <b>' + esc(w.de) + '</b> force here?';
+      d.prompt = w.de + ' ___ ' + G.nounForm(noun, k, false) + cue;
+      d.promptClass = 'small';
+      d.type = 'choice';
+      let opts = [...new Set([art,
+        G.artikel(noun.g, 1, false), G.artikel(noun.g, 2, false),
+        G.artikel(noun.g, 3, false), G.artikel(noun.g, 0, false)])];
+      for (const e of ['der', 'die', 'das', 'dem', 'den', 'des']) { if (opts.length >= 4) break; if (!opts.includes(e)) opts.push(e); }
+      opts = shuffle(opts).slice(0, 4);
+      if (!opts.includes(art)) opts[0] = art;
+      d.options = shuffle(opts);
+      d.answer = art;
+      d.ex = w.de + ' ' + G.nounPhrase(noun, k, false);
+      d.exEn = w.en + ' the ' + noun.en;
+      d.why = w.x === 'Dat/Akk'
+        ? '<b>Wechselpräposition</b>: wohin? → Akkusativ (movement), wo? → Dativ (location). Here it is the <b>' + KASUS[k] + '</b>.'
+        : '<b>' + esc(w.de) + '</b> always forces the <b>' + KASUS[k] + '</b>.';
       break;
     }
     case 'wo': {
