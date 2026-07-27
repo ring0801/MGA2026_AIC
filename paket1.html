@@ -3206,14 +3206,17 @@ function buildQueue() {
     else if (rec[1] <= today()) pool.push({ i: w.i, s, pri: 0, order: rec[1] * 1000 + rec[0] });
     else pool.push({ i: w.i, s, pri: 3, order: rec[1] });
   }));
-  const due = pool.filter(p => p.pri === 0).sort((a, b) => a.order - b.order);
-  const fresh = pool.filter(p => p.pri === 2).sort((a, b) => a.order - b.order);
-  const rest = shuffle(pool.filter(p => p.pri === 3)).slice(0, S.len);
+  const due = pool.filter(p => p.pri === 0).sort((a, b) => a.order - b.order);   // ripe reviews, oldest first
+  const fresh = pool.filter(p => p.pri === 2).sort((a, b) => a.order - b.order); // new, in the list's curated order
+  const ahead = pool.filter(p => p.pri === 3).sort((a, b) => a.order - b.order); // already seen, soonest due first
   const n = S.len;
   const newCap = Math.max(4, Math.round(n * 0.45));
-  const q = due.slice(0, n - Math.min(newCap, fresh.length));
-  q.push(...fresh.slice(0, n - q.length));
-  if (q.length < n) q.push(...rest.slice(0, n - q.length));
+  const q = [];
+  q.push(...due.slice(0, n));                                                    // 1. everything the scheduler says is ripe
+  const takeNew = Math.min(newCap, fresh.length, n - q.length);
+  q.push(...fresh.slice(0, takeNew));                                            // 2. a capped trickle of new material
+  if (q.length < n) q.push(...ahead.slice(0, n - q.length));                     // 3. reinforce what's soonest due (instead of racing ahead)
+  if (q.length < n) q.push(...fresh.slice(takeNew, takeNew + (n - q.length)));   // 4. only now, more new — e.g. a brand-new profile
   return shuffle(q).slice(0, n);
 }
 
