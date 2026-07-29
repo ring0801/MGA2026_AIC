@@ -402,6 +402,10 @@ body{overflow-x:clip}
 .sterneline{font-size:14px;margin:10px 0 4px}
 .sterneline b{color:var(--gelb);font-family:var(--mono)}
 
+/* the shape of a word whose English is shared by another word */
+.gestalt{font-family:var(--mono);font-size:19px;letter-spacing:.22em;color:var(--ink-40);
+  margin:-4px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 /* ============ DAS SPIEL — Tagwerk, Vertrauen, Die Post ============ */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:14px}
 .small{font-size:12px}
@@ -538,6 +542,7 @@ body{overflow-x:clip}
       <div class="drill-body">
         <p class="ask" id="dAsk"></p>
         <p class="prompt" id="dPrompt"></p>
+      <p class="gestalt hide" id="dGestalt" title="This English can mean more than one German word — this is the shape of the one being asked for."></p>
         <div id="dSlot" class="slot hide"></div>
         <div id="dInputWrap" class="hide">
           <input class="answer" id="dInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
@@ -2958,6 +2963,50 @@ const SRS = {
 };
 
 /* which drills does a word support */
+/* ---------- which prompts cannot be answered from the English alone ----------
+
+   "to pay" is zahlen and it is also bezahlen. Shown that prompt and asked for
+   the German, there is no way to know which is wanted, and a learner who
+   writes the other one has not made a mistake.
+
+   So: any word that shares a listed sense with another word of the same part
+   of speech gets a shape alongside the gloss — its first letter and a dot for
+   every letter after it. Enough to pick the right word out, never enough to
+   give away one you do not know. If two candidates share a first letter and a
+   length, the shape grows a letter until they come apart. All worked out from
+   the word list itself, so later Pakete get it without anyone writing a note. */
+const MEHRDEUTIG = (() => {
+  const proSinn = new Map();                    // "to pay|v" -> [word, ...]
+  const sinne = w => String(w.en || '').split(',').map(x => x.trim()).filter(Boolean);
+  LEX.forEach(w => sinne(w).forEach(sn => {
+    const k = sn.toLowerCase() + '|' + w.pos;
+    if (!proSinn.has(k)) proSinn.set(k, []);
+    proSinn.get(k).push(w);
+  }));
+  const rivalen = new Map();                    // word index -> [rival, ...]
+  proSinn.forEach(gruppe => {
+    if (gruppe.length < 2) return;
+    gruppe.forEach(w => {
+      const bag = rivalen.get(w.i) || [];
+      gruppe.forEach(x => { if (x.i !== w.i && bag.indexOf(x) < 0) bag.push(x); });
+      rivalen.set(w.i, bag);
+    });
+  });
+  const form = (de, n) => {
+    const sichtbar = de.slice(0, n);
+    const rest = de.slice(n).replace(/[^ ]/g, '\u00b7');
+    return sichtbar + rest;
+  };
+  const gestalt = new Map();
+  rivalen.forEach((bag, i) => {
+    const w = LEX[i];
+    let n = 1;
+    while (n < w.de.length && bag.some(x => form(x.de, n) === form(w.de, n))) n++;
+    gestalt.set(i, form(w.de, n));
+  });
+  return gestalt;
+})();
+
 function skillsFor(w) {
   const s = ['m', 'p'];
   if (w.pos === 'n') s.push('g', 'pl', 'k');
@@ -2998,7 +3047,13 @@ function distractors(w, n, field) {
   const wide = LEX.filter(x => x.pos === w.pos && x.i !== w.i);
   const picks = [];
   const src = shuffle(pool.length >= n ? pool : wide);
-  for (const c of src) { if (picks.length >= n) break; if (!picks.some(p => p[field] === c[field])) picks.push(c); }
+  /* also guard against the word being asked: bezahlen and zahlen both read
+     "to pay", and offering both makes one of two right answers wrong */
+  for (const c of src) {
+    if (picks.length >= n) break;
+    if (c[field] === w[field]) continue;
+    if (!picks.some(p => p[field] === c[field])) picks.push(c);
+  }
   return picks.map(p => p[field]);
 }
 
@@ -3086,6 +3141,7 @@ function makeDrill(idx, skill) {
     case 'p': {
       d.ask = 'Write the German ' + posLabel + '.';
       d.prompt = w.en; d.promptClass = 'en';
+      d.gestalt = MEHRDEUTIG.get(w.i) || '';   /* only when the gloss is shared */
       d.type = 'type'; d.answer = w.de;
       d.accept = [w.de, w.de.replace(/ \(sich\)$/, '')];
       if (w.pos === 'n') d.accept.push(G.artikel(w.g, 0, false) + ' ' + w.de);
@@ -3453,6 +3509,11 @@ function nextItem() {
   $('#dAsk').innerHTML = d.ask;
   $('#dPrompt').textContent = d.prompt;
   $('#dPrompt').className = 'prompt ' + (d.promptClass || '');
+  const gs = $('#dGestalt');
+  if (gs) {
+    gs.textContent = d.gestalt || '';
+    gs.classList.toggle('hide', !d.gestalt);
+  }
   const slot = $('#dSlot');
   if (d.slot) { slot.classList.remove('hide'); slot.textContent = d.slot; } else slot.classList.add('hide');
   $('#dVerdict').innerHTML = '';
@@ -4946,7 +5007,7 @@ function paintTagwerk() {
     '<p class="tiny" style="margin:9px 0 0">' +
     (fertig === 3
       ? 'Alle drei erledigt — ✦ ' + S.tag.lohn + ' Sterne heute. Morgen kommen drei neue.'
-      : fertig + ' von 3 erledigt. Die Aufgaben stehen für den ganzen Tag fest; sie würfeln sich nicht neu.') +
+      : fertig + ' von 3 erledigt. Die Aufgaben gelten den ganzen Tag und ändern sich nicht.') +
     '</p>';
 }
 

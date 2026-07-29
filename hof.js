@@ -601,11 +601,11 @@
     { id: 'zwei', de: 'Zwei Runden beenden', en: 'Finish two rounds', ziel: 2, feld: 'sess', stern: 2 },
     { id: 'zwanzig', de: '20 Fragen beantworten', en: 'Answer 20 questions', ziel: 20, feld: 'ans', stern: 1 },
     { id: 'dreissig', de: '30 richtige Antworten', en: '30 correct answers', ziel: 30, feld: 'right', stern: 2 },
-    { id: 'kombo', de: 'Eine Kombo von 10', en: 'Reach a combo of 10', ziel: 10, feld: 'best', stern: 1 },
-    { id: 'faellig', de: '15 fällige Wörter räumen', en: 'Clear 15 due words', ziel: 15, feld: 'faellig', stern: 2 },
-    { id: 'neu', de: '5 neue Wörter treffen', en: 'Meet 5 new words', ziel: 5, feld: 'neu', stern: 1 },
-    { id: 'sauber', de: 'Eine Runde mit 90 %', en: 'A round at 90% or better', ziel: 1, feld: 'sauber', stern: 2 },
-    { id: 'feld', de: 'Ein Feld gezielt üben', en: 'Practise one field on purpose', ziel: 1, feld: 'feld', stern: 1 }
+    { id: 'kombo', de: 'Eine Kombo von 10 erreichen', en: 'Get 10 right in a row', ziel: 10, feld: 'best', stern: 1 },
+    { id: 'faellig', de: '15 fällige Wörter wiederholen', en: 'Review 15 words that are due', ziel: 15, feld: 'faellig', stern: 2 },
+    { id: 'neu', de: '5 neue Wörter kennenlernen', en: 'See 5 new words for the first time', ziel: 5, feld: 'neu', stern: 1 },
+    { id: 'sauber', de: 'Eine Runde mit 90 % schaffen', en: 'Score 90% or better in a round', ziel: 1, feld: 'sauber', stern: 2 },
+    { id: 'feld', de: 'Ein Feld gezielt üben', en: 'Practise a single field', ziel: 1, feld: 'feld', stern: 1 }
   ];
   var VONA = {};
   AUFGABEN.forEach(function (a) { VONA[a.id] = a; });
