@@ -64,8 +64,9 @@ button{cursor:pointer;border:none;background:none}
 
 /* ---------- tabs ---------- */
 nav.tabs{position:sticky;top:0;z-index:39;display:flex;gap:0;background:var(--ink);margin:0 0 16px;padding:0 14px 8px}
-nav.tabs .in{display:flex;max-width:732px;margin:0 auto;width:100%;gap:2px}
-nav.tabs button{flex:1;font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-size:15px;font-weight:600;
+nav.tabs .in{display:flex;max-width:732px;margin:0 auto;width:100%;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+nav.tabs .in::-webkit-scrollbar{display:none}
+nav.tabs button{flex:1;min-width:max-content;white-space:nowrap;font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-size:15px;font-weight:600;
   color:rgba(231,232,227,.55);padding:7px 2px;border-bottom:3px solid transparent;transition:.15s}
 nav.tabs button[aria-selected="true"]{color:var(--paper);border-bottom-color:var(--gelb)}
 
@@ -265,6 +266,9 @@ details.acc .in{padding:0 13px 13px}
 
 /* ---------- a header that cannot overflow ---------- */
 body{overflow-x:clip}
+.top-row{min-width:0}
+.top-row .mark{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top-row .chip{flex:0 0 auto}
 .top-row{gap:8px;min-width:0}
 .top-row .chip{flex:0 0 auto}
 .xplabel{gap:10px}
@@ -397,8 +401,59 @@ body{overflow-x:clip}
 .feld .fm{font-family:var(--mono);font-size:10.5px;color:var(--ink-40)}
 .sterneline{font-size:14px;margin:10px 0 4px}
 .sterneline b{color:var(--gelb);font-family:var(--mono)}
+
+/* ============ DAS SPIEL — Tagwerk, Vertrauen, Die Post ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.small{font-size:12px}
+
+/* the day's work */
+.tagwerk .tw{display:flex;flex-direction:column;gap:9px;margin-top:2px}
+.twr{display:flex;align-items:center;gap:10px}
+.twk{flex:none;width:14px;text-align:center;font-family:var(--mono);font-size:13px;color:var(--ink-40)}
+.twr.ok .twk{color:var(--gruen)}
+.twn{flex:1 1 auto;min-width:0}
+.twn b{display:block;font-weight:500;font-size:14.5px;line-height:1.2;overflow-wrap:break-word}
+.twn s{display:block;text-decoration:none;font-family:var(--mono);font-size:10px;color:var(--ink-40);margin-top:1px}
+.twr.ok .twn b{color:var(--ink-60)}
+.twr2{flex:none;display:flex;align-items:center;gap:8px}
+.twb{display:block;width:54px;height:6px;background:var(--paper-2);border-radius:3px;overflow:hidden}
+.twb i{display:block;height:100%;background:var(--blau);border-radius:3px;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.twr.ok .twb i{background:var(--gruen)}
+.twz{font-family:var(--mono);font-size:10.5px;color:var(--ink-40);white-space:nowrap}
+.tws{font-family:var(--mono);font-size:11px;color:var(--gelb);white-space:nowrap}
+@media(max-width:344px){.twb{width:30px}.twn s{display:none}}
+
+/* what was buried in the field */
+.verdict .schatzfund{display:block;margin-top:9px;padding-top:7px;font-family:var(--mono);font-size:11.5px;
+  color:#8A6100;border-top:1px solid rgba(232,162,0,.4)}
+
+/* how well she knows you */
+.vtr{display:flex;flex-direction:column;gap:5px;padding:10px 0;border-top:1px solid var(--line)}
+.vcard .vtr:first-of-type{border-top:none;padding-top:3px}
+.vh{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.vh i{width:9px;height:9px;border-radius:2px;flex:none}
+.vh b{font-family:var(--disp);font-size:18px;letter-spacing:.01em}
+.vh s{text-decoration:none;font-family:var(--mono);font-size:10.5px;color:var(--ink-40)}
+.vb{display:block;height:6px;background:var(--paper-2);border-radius:3px;overflow:hidden}
+.vb i{display:block;height:100%;border-radius:3px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.vm{font-family:var(--mono);font-size:10.5px;color:var(--ink-60)}
+
+/* the letter box */
+.briefe{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(226px,1fr));margin-top:4px}
+.brief{display:flex;flex-direction:column;gap:5px;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;
+  transition:border-color .15s,transform .1s}
+.brief:hover{border-color:var(--ink-40)}
+.brief:active{transform:translateY(1px)}
+.bh{display:flex;align-items:center;gap:6px}
+.bh i{width:8px;height:8px;border-radius:2px;flex:none}
+.bh b{font-family:var(--disp);font-size:15px;letter-spacing:.01em}
+.bh s{margin-left:auto;text-decoration:none;font-family:var(--mono);font-size:9.5px;color:var(--ink-40);white-space:nowrap}
+.bt{font-size:12.5px;line-height:1.4;color:var(--ink-60)}
+@media(prefers-reduced-motion:reduce){.brief:active{transform:none}}
 </style>
 <script src="season.js"></script>
+<script src="hof.js"></script>
 </head>
 <body>
 <header class="top">
@@ -581,6 +636,7 @@ body{overflow-x:clip}
       <button class="btn ghost" id="btnImport" style="flex:1">Paste a code</button>
     </div>
     <p class="tiny" style="margin:0 0 4px">Codes merge, they don't overwrite: for every word the further-along record wins, so you can paste in either direction without losing work.</p>
+    <p class="tiny" style="margin:0 0 4px">A code carries your level, streak, badges and the whole realm — letters, Vertrauen, wardrobe and Sterne — plus the scheduling for <b>this Paket only</b>. Copy one from each Paket you have started; they merge together in any order, and importing one can never disturb another's words. Merging always keeps the further-along side, so an older code cannot overwrite what you have here.</p>
     <textarea id="codeBox" class="hide" style="width:100%;height:110px;font-family:var(--mono);font-size:11px;padding:8px;border:1px solid var(--line);border-radius:3px;background:#fff;margin-top:8px"></textarea>
     <div class="row hide" id="codeRow" style="margin-top:8px">
       <button class="btn gruen" id="btnMerge" style="flex:1">Merge it in</button>
@@ -2587,7 +2643,12 @@ const TENSES = [
 
 /* ---------- 3.3 storage ---------- */
 const DAY = 86400000;
-const today = () => Math.floor(Date.now() / DAY);
+/* The reader's day, not Greenwich's. Date.now() is UTC, so dividing it by a
+   day put the rollover at UTC midnight — 09:00 in Tokyo, 19:00 in New York.
+   Shifting by the local offset first makes a day mean the day you are living
+   in. Every page that writes to the shared profile uses this same definition;
+   they must never disagree, or one of them will think it is tomorrow. */
+const today = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / DAY);
 
 const mem = {};
 let STORE_MODE = 'memory';
@@ -2657,23 +2718,139 @@ function migrateIndexKeys(oldSched) {
   return { out, moved, lost };
 }
 
+/* ---------- 3.3b the realm, in transit ----------
+   Sets travel as sets. The two things that are not sets travel as something
+   that is: Sterne go as lifetime earnings (balance + everything you have
+   bought), which only ever climbs, and the balance is rebuilt on arrival. */
+function sterneKosten(st) {
+  const R = (st && st.reich) || {};
+  let n = 0;
+  const add = (bag, liste) => Object.keys(bag || {}).forEach(pk =>
+    (bag[pk] || []).forEach(id => { const it = liste.find(x => x.id === id); if (it) n += it.kost; }));
+  add(R.kleid, KLEIDER); add(R.land, GELAENDE);
+  return n;
+}
+const REALM = {
+  pack(st) {
+    const R = (st && st.reich) || {};
+    const perPack = bag => Object.keys(bag || {})
+      .map(pk => [pk].concat(bag[pk] || []).join('.')).join(',');
+    return [
+      'g:' + (R.gesehen || []).join(','),
+      'p:' + (R.post || []).filter(e => e && e.id).map(e => e.id + '.' + (e.t || 0).toString(36)).join(','),
+      'w:' + Object.keys(R.wahl || {}).map(k => k + '.' + R.wahl[k]).join(','),
+      'k:' + perPack(R.kleid),
+      'l:' + perPack(R.land),
+      'b:' + Object.keys(R.besuch || {}).map(pk => pk + '.' + (R.besuch[pk] || 0)).join(','),
+      'v:' + ((R.sterne || 0) + sterneKosten(st)),
+      'm:' + (R.mast || 0),
+      't:' + (st.tagwerk || 0),
+      's:' + (st.schatz || 0)
+    ].join(';');
+  },
+  unpack(txt, st) {
+    const feld = {};
+    (txt || '').split(';').forEach(teil => {
+      const i = teil.indexOf(':');
+      if (i > 0) feld[teil.slice(0, i)] = teil.slice(i + 1);
+    });
+    const liste = k => (feld[k] || '').split(',').filter(Boolean);
+    const perPack = k => {
+      const out = {};
+      liste(k).forEach(e => { const q = e.split('.'); if (q[0]) out[q[0]] = q.slice(1).filter(Boolean); });
+      return out;
+    };
+    const R = st.reich;
+    R.gesehen = liste('g');
+    R.post = liste('p').map(e => {
+      const c = e.lastIndexOf('.');
+      return { id: e.slice(0, c), pack: 'p1', t: parseInt(e.slice(c + 1), 36) || 0 };
+    }).filter(e => e.id);
+    R.wahl = {};
+    liste('w').forEach(e => { const c = e.lastIndexOf('.'); R.wahl[e.slice(0, c)] = +e.slice(c + 1) || 0; });
+    R.kleid = perPack('k');
+    R.land = perPack('l');
+    R.besuch = {};
+    liste('b').forEach(e => { const q = e.split('.'); R.besuch[q[0]] = +q[1] || 0; });
+    R.mast = +feld.m || 0;
+    st.tagwerk = +feld.t || 0;
+    st.schatz = +feld.s || 0;
+    st._verdient = +feld.v || 0;
+    st._realm = true;
+    return st;
+  },
+  /* sets union; the gate takes the higher count; the purse is rebuilt from
+     lifetime earnings minus everything the merged profile now owns */
+  merge(m, a, b) {
+    if (!b._realm) return m;                       // an older code carries no realm
+    const ra = a.reich || {}, rb = b.reich || {};
+    const R = m.reich;
+    const vereine = (x, y) => Array.from(new Set([].concat(x || [], y || [])));
+    R.gesehen = vereine(ra.gesehen, rb.gesehen);
+    const gesehenIds = {};
+    [].concat(ra.post || [], rb.post || []).forEach(e => {
+      if (!e || !e.id) return;
+      if (!gesehenIds[e.id] || (e.t || 0) > gesehenIds[e.id].t) gesehenIds[e.id] = { id: e.id, pack: e.pack || 'p1', t: e.t || 0 };
+    });
+    R.post = Object.keys(gesehenIds).map(k => gesehenIds[k]).sort((x, y) => y.t - x.t).slice(0, 90);
+    R.wahl = Object.assign({}, rb.wahl || {}, ra.wahl || {});   // your own answer wins
+    ['kleid', 'land'].forEach(feld => {
+      const out = {};
+      Object.keys(Object.assign({}, ra[feld] || {}, rb[feld] || {})).forEach(pk => {
+        out[pk] = vereine((ra[feld] || {})[pk], (rb[feld] || {})[pk]);
+      });
+      R[feld] = out;
+    });
+    R.besuch = {};
+    Object.keys(Object.assign({}, ra.besuch || {}, rb.besuch || {})).forEach(pk => {
+      R.besuch[pk] = Math.max((ra.besuch || {})[pk] || 0, (rb.besuch || {})[pk] || 0);
+    });
+    R.mast = Math.max(ra.mast || 0, rb.mast || 0);
+    m.tagwerk = Math.max(a.tagwerk || 0, b.tagwerk || 0);
+    m.schatz = Math.max(a.schatz || 0, b.schatz || 0);
+    const verdient = Math.max((ra.sterne || 0) + sterneKosten(a), b._verdient || 0);
+    R.sterne = Math.max(0, verdient - sterneKosten(m));
+    return m;
+  }
+};
+
 /* ---------- 3.3b portable state: pack / unpack / merge ---------- */
 const CODE = {
-  pack(st) {
-    const head = [2, st.xp, st.streak, st.lastDay, st.sessions, st.answers, st.correct, st.bestCombo, st.shaky || 0]
-      .map(n => (n || 0).toString(36)).join(',');
+  /* `nurHier` keeps the code to this Paket's own words. The manual code uses
+     it — otherwise it would carry every pack you have ever opened and grow for
+     as long as you keep learning. Automatic sync does not: it is an HTTP body,
+     and a scoped push would let one pack overwrite another's words. */
+  pack(st, nurHier) {
+    const meine = nurHier ? new Set(LEX.map(w => w.de + '~' + w.pos)) : null;
+    const schluessel = Object.keys(st.sched).filter(k => {
+      if (!meine) return true;
+      return meine.has(k.slice(0, k.lastIndexOf(':')));
+    });
+    /* every due date as an offset from the earliest one: three characters
+       become one, and the lapse count disappears whenever it is zero */
+    let basis = 0;
+    schluessel.forEach(k => {
+      const d = st.sched[k][1] || 0;
+      if (d && (!basis || d < basis)) basis = d;
+    });
+    const head = [3, st.xp, st.streak, st.lastDay, st.sessions, st.answers, st.correct,
+      st.bestCombo, st.shaky || 0, basis].map(n => (n || 0).toString(36)).join(',');
     const grouped = {};
-    Object.keys(st.sched).forEach(k => {
+    schluessel.forEach(k => {
       const c = k.lastIndexOf(':'), word = k.slice(0, c), skill = k.slice(c + 1), r = st.sched[k];
-      (grouped[word] = grouped[word] || []).push(skill + '.' + (r[0] || 0).toString(36) + '.' + (r[1] || 0).toString(36) + '.' + (r[2] || 0).toString(36));
+      const ab = Math.max(0, (r[1] || 0) - basis);
+      const lap = r[2] || 0;
+      (grouped[word] = grouped[word] || []).push(
+        skill + '.' + (r[0] || 0).toString(36) + '.' + ab.toString(36) + (lap ? '.' + lap.toString(36) : ''));
     });
     const sched = Object.keys(grouped).map(w => w + '~' + grouped[w].join(',')).join(';');
     const last = st.last ? [st.last.plan, st.last.score, st.last.total, st.last.day].join('^') : '';
-    return ['WW2', head, st.badges.join(','), last, sched].join('|');
+    return ['WW3', head, st.badges.join(','), last, sched, REALM.pack(st)].join('|');
   },
   unpack(txt) {
     const p = (txt || '').trim().split('|');
     if (p[0] === 'WW1') return CODE.unpackV1(p);
+    if (p[0] === 'WW3') return CODE.unpackV3(p);
     if (p[0] !== 'WW2' || p.length < 5) throw new Error('That does not look like a Wortwerk code.');
     const h = p[1].split(',').map(x => parseInt(x, 36) || 0);
     const st = JSON.parse(JSON.stringify(DEFAULT));
@@ -2681,6 +2858,7 @@ const CODE = {
     st.sessions = h[4]; st.answers = h[5]; st.correct = h[6]; st.bestCombo = h[7]; st.shaky = h[8] || 0;
     st.badges = p[2] ? p[2].split(',').filter(Boolean) : [];
     if (p[3]) { const l = p[3].split('^'); st.last = { plan: l[0], score: +l[1], total: +l[2], day: +l[3] }; }
+    if (p[5]) { try { REALM.unpack(p[5], st); } catch (e) { } }
     (p[4] ? p[4].split(';') : []).forEach(e => {
       if (!e) return;
       const cut = e.lastIndexOf('~');
@@ -2690,6 +2868,35 @@ const CODE = {
       rest.split(',').forEach(f => {
         const q = f.split('.');
         st.sched[full + ':' + q[0]] = [parseInt(q[1], 36) || 0, parseInt(q[2], 36) || 0, parseInt(q[3], 36) || 0];
+      });
+    });
+    return st;
+  },
+  /* Same shape as WW2, but the days are offsets from a base in the header and
+     a missing lapse count means zero. */
+  unpackV3(p) {
+    if (p.length < 5) throw new Error('That code is incomplete.');
+    const h = p[1].split(',').map(x => parseInt(x, 36) || 0);
+    const st = JSON.parse(JSON.stringify(DEFAULT));
+    st.xp = h[1]; st.streak = h[2]; st.lastDay = h[3];
+    st.sessions = h[4]; st.answers = h[5]; st.correct = h[6];
+    st.bestCombo = h[7]; st.shaky = h[8] || 0;
+    const basis = h[9] || 0;
+    st.badges = p[2] ? p[2].split(',').filter(Boolean) : [];
+    if (p[3]) { const l = p[3].split('^'); st.last = { plan: l[0], score: +l[1], total: +l[2], day: +l[3] }; }
+    if (p[5]) { try { REALM.unpack(p[5], st); } catch (e) { } }
+    (p[4] ? p[4].split(';') : []).forEach(e => {
+      if (!e) return;
+      const cut = e.lastIndexOf('~');
+      const wort = e.slice(0, cut), rest = e.slice(cut + 1);
+      rest.split(',').forEach(f => {
+        const q = f.split('.');
+        if (!q[0]) return;
+        st.sched[wort + ':' + q[0]] = [
+          parseInt(q[1], 36) || 0,
+          basis + (parseInt(q[2], 36) || 0),
+          q.length > 3 ? (parseInt(q[3], 36) || 0) : 0
+        ];
       });
     });
     return st;
@@ -2725,6 +2932,7 @@ const CODE = {
       m.sched[k] = (y[0] > x[0] || (y[0] === x[0] && y[1] > x[1])) ? y.slice() : x.slice();
       m.sched[k][2] = Math.max(x[2] || 0, y[2] || 0);
     });
+    try { REALM.merge(m, a, b); } catch (e) { }
     return m;
   }
 };
@@ -4519,6 +4727,7 @@ async function boot() {
       save(true);
     }
   }
+  try { heileProfil(); } catch (e) { }
   if (S.last && S.last.day != null) {
     const dd = today() - S.last.day;
     S.last.ago = dd === 0 ? 'earlier today' : dd === 1 ? 'yesterday' : dd + ' days ago';
@@ -4571,7 +4780,7 @@ async function boot() {
     t.focus(); if (!editable) t.select();
   };
   $('#btnExport').onclick = async () => {
-    const s = CODE.pack(S);
+    const s = CODE.pack(S, true);
     showCode(s, false);
     try { await navigator.clipboard.writeText(s); toast('Code copied · ' + (s.length / 1024).toFixed(1) + ' KB'); }
     catch (e) { toast('Select the box and copy'); }
@@ -4611,5 +4820,489 @@ async function boot() {
   if (S.sync && S.sync.auto && S.sync.url) { await syncPull(true); paintHeader(); }
   if (S.last) toast('Welcome back — ' + stats().due + ' items are due');
 }
+
+/* ============================================================
+   8. DAS SPIEL — the layer where the realm answers back.
+
+   Everything below is glue. It owns no truth of its own: the
+   scheduler still decides what is learned, `hof.js` still holds
+   what the six of them say, and this section only decides *when*
+   a window opens, keeps the day's tally, and pays out the small
+   change. If hof.js is missing the whole section goes quiet and
+   the Paket works exactly as it did before.
+
+   Three new things live here:
+
+     Vertrauen   one point per DAY you finish a run with her —
+                 never per answer. Her story unlocks at the speed
+                 of a habit, so it cannot be binged or bought.
+     Tagwerk     three tasks chosen by the calendar, not by luck.
+                 Small Sterne, capped, gone at midnight.
+     Die Post    every letter she ever sent you, kept.
+   ============================================================ */
+
+/* A stored profile can come back damaged: a save interrupted half-way, an
+   edited localStorage, a code pasted from something that was not Wortwerk.
+   None of the checks below are clever — they simply guarantee the shapes the
+   rest of the app already assumes, so one bad field cannot blank the page. */
+function heileProfil() {
+  const zahl = (v, d) => (typeof v === 'number' && isFinite(v)) ? v : d;
+  if (!Array.isArray(S.badges)) S.badges = [];
+  if (!S.sched || typeof S.sched !== 'object') S.sched = {};
+  if (!S.sync || typeof S.sync !== 'object') S.sync = { url: '', token: '', auto: false };
+  ['xp', 'streak', 'lastDay', 'sessions', 'answers', 'correct', 'bestCombo', 'shaky', 'tagwerk', 'schatz']
+    .forEach(k => { S[k] = zahl(S[k], 0); });
+  if ([10, 20, 30, 50].indexOf(S.len) < 0) S.len = 20;
+  if (!PLANS.some(p => p.id === S.plan)) S.plan = 'mix';
+  if (S.last && typeof S.last !== 'object') S.last = null;
+  /* A profile written under the old UTC boundary can carry a day number that
+     is now in the future. Left alone the streak rule reads that as a break. */
+  if (S.lastDay > today()) S.lastDay = today();
+  if (S.reich && S.reich.wach) Object.keys(S.reich.wach).forEach(k => {
+    if (S.reich.wach[k] > today()) S.reich.wach[k] = today();
+  });
+  if (S.reich && S.reich.fenstZeit > Date.now()) S.reich.fenstZeit = 0;
+  if (!S.reich || typeof S.reich !== 'object') S.reich = JSON.parse(JSON.stringify(DEFAULT.reich));
+  if (!S.tag || typeof S.tag !== 'object' || Array.isArray(S.tag)) S.tag = null;
+}
+
+function leererTag() {
+  return {
+    d: today(), ans: 0, right: 0, best: 0, faellig: 0, neu: 0,
+    sess: 0, sauber: 0, feld: 0, shaky: 0, schatz: 0, done: [], lohn: 0, voll: 0
+  };
+}
+function tagRoll() { if (!S.tag || S.tag.d !== today()) S.tag = leererTag(); }
+
+function spielInit() {
+  reichInit();
+  const R = S.reich;
+  if (!R.besuch || typeof R.besuch !== 'object') R.besuch = {};
+  if (!Array.isArray(R.gesehen)) R.gesehen = [];
+  if (!Array.isArray(R.post)) R.post = [];
+  if (!R.wahl || typeof R.wahl !== 'object') R.wahl = {};
+  if (typeof R.sterne !== 'number' || !isFinite(R.sterne)) R.sterne = 0;
+  if (typeof R.szeneBei !== 'number') R.szeneBei = 0;
+  if (typeof S.tagwerk !== 'number' || !isFinite(S.tagwerk)) S.tagwerk = 0;
+  if (typeof S.schatz !== 'number' || !isFinite(S.schatz)) S.schatz = 0;
+  if (!Array.isArray(S.tag && S.tag.done)) { if (S.tag) S.tag.done = []; }
+  tagRoll();
+}
+const vertrauen = pk => ((S.reich && S.reich.besuch && S.reich.besuch[pk]) || 0);
+
+/* ---------- 8.1 Tagwerk ---------- */
+function pruefeTagwerk() {
+  if (!window.Hof) return;
+  spielInit();
+  const plan = Hof.tagesplan(today());
+  const neu = [];
+  plan.forEach(a => {
+    if (S.tag.done.indexOf(a.id) > -1) return;
+    if (!Hof.stand(a, S.tag).fertig) return;
+    S.tag.done.push(a.id);
+    S.reich.sterne += a.stern;
+    S.tag.lohn += a.stern;
+    neu.push(a);
+  });
+  if (!neu.length) return;
+  const alleDrei = plan.every(a => S.tag.done.indexOf(a.id) > -1);
+  if (alleDrei && !S.tag.voll) { S.tag.voll = 1; S.tagwerk = (S.tagwerk || 0) + 1; }
+  const lohn = neu.reduce((n, a) => n + a.stern, 0);
+  toast((alleDrei ? 'Tagwerk vollbracht' : 'Tagwerk: ' + neu[0].de) + ' · ✦ +' + lohn);
+  try { KLANG.se('badge'); } catch (e) { }
+  save(true);
+  try { paintTagwerk(); paintStrip(); if (VIEW === 'reich') paintReich(); } catch (e) { }
+}
+
+function paintTagwerk() {
+  const host = $('#sessionSetup');
+  if (!host || !window.Hof) return;
+  spielInit();
+  let el = $('#tagwerk');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'tagwerk';
+    el.className = 'panel tagwerk';
+    /* after the workout picker, so nothing is pushed between you and Start */
+    const len = host.querySelector('#lenRow');
+    const nach = len ? len.closest('.panel') : null;
+    if (nach && nach.parentNode === host) host.insertBefore(el, nach);
+    else host.appendChild(el);
+  }
+  const plan = Hof.tagesplan(today());
+  const fertig = plan.filter(a => S.tag.done.indexOf(a.id) > -1).length;
+  el.innerHTML =
+    '<p class="eyebrow">Tagwerk · was heute zählt</p>' +
+    '<div class="tw">' + plan.map(a => {
+      const st = Hof.stand(a, S.tag), ok = S.tag.done.indexOf(a.id) > -1;
+      const pct = Math.round(100 * st.have / st.ziel);
+      return '<div class="twr' + (ok ? ' ok' : '') + '">' +
+        '<span class="twk">' + (ok ? '✓' : '·') + '</span>' +
+        '<span class="twn"><b>' + esc(a.de) + '</b><s>' + esc(a.en) + '</s></span>' +
+        '<span class="twr2"><span class="twb"><i style="width:' + pct + '%"></i></span>' +
+        '<span class="twz">' + st.have + '/' + st.ziel + '</span>' +
+        '<span class="tws">✦' + a.stern + '</span></span></div>';
+    }).join('') + '</div>' +
+    '<p class="tiny" style="margin:9px 0 0">' +
+    (fertig === 3
+      ? 'Alle drei erledigt — ✦ ' + S.tag.lohn + ' Sterne heute. Morgen kommen drei neue.'
+      : fertig + ' von 3 erledigt. Die Aufgaben stehen für den ganzen Tag fest; sie würfeln sich nicht neu.') +
+    '</p>';
+}
+
+/* ---------- 8.2 the window ---------- */
+function portraetSVG(pk, px) {
+  const p = PROVINZ.find(x => x.pack === pk) || tended();
+  const st = provStat(p, false);
+  return spriteSVG(stufeOf(st), p.col, { px: px || 7, sleep: false, worn: worn(p.pack), face: 'ruhe' });
+}
+
+function postAblegen(sz) {
+  spielInit();
+  const R = S.reich;
+  if (R.gesehen.indexOf(sz.id) < 0) R.gesehen.push(sz.id);
+  if (!R.post.some(e => e && e.id === sz.id)) R.post.unshift({ id: sz.id, pack: sz.pack, t: today() });
+  if (R.post.length > 90) R.post.length = 90;
+  R.szeneBei = S.sessions;
+  save(true);
+}
+
+function zeigeSzene(sz, replay) {
+  if (!window.Hof || !sz) return false;
+  const p = PROVINZ.find(x => x.pack === sz.pack) || tended();
+  let beantwortet = false;
+  return Hof.fenster(sz, {
+    lang: 'de',
+    portrait: portraetSVG(sz.pack, 7),
+    accent: p.col,
+    replay: !!replay,
+    onGabe: n => {
+      spielInit();
+      S.reich.sterne += n;
+      save(true);
+      try { paintStrip(); } catch (e) { }
+    },
+    onWahl: i => { beantwortet = true; spielInit(); S.reich.wahl[sz.id] = i; save(); },
+    onClose: () => {
+      try {
+        /* Walking away from a question must not cost you the question. */
+        if (!replay && sz.typ === 'frage' && !beantwortet) {
+          spielInit();
+          const gi = S.reich.gesehen.indexOf(sz.id);
+          if (gi > -1) S.reich.gesehen.splice(gi, 1);
+          S.reich.post = S.reich.post.filter(e => !e || e.id !== sz.id);
+          save(true);
+        }
+        awardBadges();
+        paintMini(); paintStrip(); paintHeader();
+        if (VIEW === 'reich') paintReich();
+      } catch (e) { }
+    }
+  });
+}
+
+/* the moment, described in tags hof.js understands */
+function jetztKontext(extra) {
+  const w = ['immer'].concat(extra || []);
+  const h = new Date().getHours();
+  if (h >= 21 || h < 5) w.push('nacht');
+  try {
+    if (window.Season) {
+      const inf = Season.info(S.answers || 0);
+      if (inf.key === 'winter') w.push('kalt');
+      if (inf.key === 'summer') w.push('warm');
+    }
+  } catch (e) { }
+  return w;
+}
+
+const RUHIG = 90000;   /* she does not appear twice inside a minute and a half */
+
+function versucheSzene(wann, laune) {
+  if (!window.Hof) return false;
+  spielInit();
+  if (Date.now() - (S.reich.fenstZeit || 0) < RUHIG) return false;
+  const pk = PACK.id;
+  const ctx = {
+    pack: pk, bond: vertrauen(pk), wann: wann, laune: laune,
+    gesehen: S.reich.gesehen, wahl: S.reich.wahl
+  };
+  let sz = Hof.waehle(ctx), wieder = false;
+  if (!sz) {
+    /* nothing new within reach — now and then, she says something again */
+    if (Math.random() > 0.28) return false;
+    sz = Hof.wiederholen(ctx);
+    wieder = true;
+  }
+  if (!sz) return false;
+  if (!zeigeSzene(sz, wieder)) return false;
+  if (wieder) { S.reich.szeneBei = S.sessions; } else { postAblegen(sz); }
+  S.reich.fenstZeit = Date.now();
+  save(true);
+  mood(sz.laune === 'mies' ? 'ruhe' : 'laecheln', 20000);
+  try { KLANG.se('page'); } catch (e) { }
+  return true;
+}
+
+/* ---------- 8.3 Schatzwort — one buried thing per round ---------- */
+function schatzPruefen(at) {
+  const s = SESSION;
+  if (!s || s.schatz !== at || s.schatzHin) return;
+  s.schatzHin = true;
+  spielInit();
+  S.tag.schatz = (S.tag.schatz || 0) + 1;
+  S.schatz = (S.schatz || 0) + 1;
+  S.reich.sterne += 1;
+  const v = $('#dVerdict .verdict');
+  if (v) v.insertAdjacentHTML('beforeend',
+    '<span class="schatzfund">✦ Schatzwort — in diesem Feld lag etwas. +1 Stern</span>');
+  toast('✦ Schatzwort gefunden');
+  try { KLANG.se('badge'); } catch (e) { }
+  try { mood('staunen', 3000); } catch (e) { }
+  save();
+}
+
+/* ---------- 8.4 Zuruf — she says one short thing, mid-round ---------- */
+function zurufPruefen(mark) {
+  const s = SESSION;
+  if (!s || !window.Hof) return;
+  const letzte = (s.rufBei == null) ? -6 : s.rufBei;
+  const seit = s.at - letzte;
+  const sag = art => { s.rufBei = s.at; Hof.ruf(PACK.id, art, 2800); };
+  if (mark === 'r') {
+    s.miss = 0;
+    const c = s.combo || 0;
+    if ((c === 8 || c === 15 || c === 25) && seit >= 4) return sag('gut');
+  } else {
+    s.miss = (s.miss || 0) + 1;
+    if (s.miss === 3 && seit >= 4) return sag('mies');
+  }
+  if (s.q.length >= 15 && s.at === s.q.length - 2 && seit >= 3) sag('ende');
+}
+
+/* ---------- 8.5 Vertrauen + Die Post, in the realm ---------- */
+function tageWort(d) { return d === 0 ? 'heute' : d === 1 ? 'gestern' : 'vor ' + d + ' Tagen'; }
+
+function paintHofExtra() {
+  const host = $('#v-reich');
+  if (!host || !window.Hof) return;
+  spielInit();
+  let el = $('#hofExtra');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'hofExtra';
+    const anchor = $('#reichHof');
+    if (anchor && anchor.parentNode === host && anchor.nextSibling) host.insertBefore(el, anchor.nextSibling);
+    else host.appendChild(el);
+  }
+
+  const R = S.reich;
+  const zeilen = PROVINZ.map(p => {
+    const st = provStat(p);
+    if (!st.built) return '';
+    const v = vertrauen(p.pack), b = Hof.bestand(p.pack, R.gesehen);
+    const per = Hof.PERSON[p.pack] || {};
+    const pct = Math.min(100, Math.round(100 * v / 30));
+    return '<div class="vtr">' +
+      '<span class="vh"><i style="background:' + p.col + '"></i><b>' + esc(p.her) + '</b>' +
+      '<s>' + esc(per.art || '') + '</s></span>' +
+      '<span class="vb"><i style="width:' + pct + '%;background:' + p.col + '"></i></span>' +
+      '<span class="vm">Vertrauen ' + v + ' · ' + b.gelesen + '/' + b.total + ' Briefe</span></div>';
+  }).join('');
+
+  const post = (R.post || []).filter(e => e && Hof.szene(e.id));
+  const liste = post.slice(0, 24).map(e => {
+    const sz = Hof.szene(e.id), per = Hof.PERSON[sz.pack] || {};
+    const roh = (sz.de || '').replace(/\s+/g, ' ').trim();
+    const kurz = roh.length > 74 ? roh.slice(0, 74) + '…' : roh;
+    return '<button class="brief" data-brief="' + esc(sz.id) + '">' +
+      '<span class="bh"><i style="background:' + (per.col || '#8A8F96') + '"></i>' +
+      '<b>' + esc(per.her || '') + '</b><s>' + tageWort(today() - (e.t || 0)) + '</s></span>' +
+      '<span class="bt">' + esc(kurz) + '</span></button>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="panel vcard"><p class="eyebrow">Vertrauen · ein Punkt pro Tag, nie pro Antwort</p>' +
+    (zeilen || '<p class="muted small">Noch keine Provinz geöffnet.</p>') +
+    '<p class="muted small" style="margin:10px 0 0">Vertrauen wächst nur, wenn du eine Runde an einem neuen Tag beendest. Es lässt sich nicht kaufen und nicht nachholen — deshalb erzählt sie dir mit der Zeit mehr.</p></div>' +
+    '<div class="panel vcard"><p class="eyebrow">Die Post · ' + post.length + ' Briefe</p>' +
+    (liste
+      ? '<div class="briefe">' + liste + '</div>' +
+      (post.length > 24 ? '<p class="tiny" style="margin:8px 0 0">Die ältesten ' + (post.length - 24) + ' liegen weiter unten im Kasten.</p>' : '')
+      : '<p class="muted small">Noch nichts angekommen. Beende eine Runde — sie meldet sich von selbst.</p>') +
+    '</div>';
+
+  $$('#hofExtra [data-brief]').forEach(b => b.onclick = () => {
+    const sz = Hof.szene(b.dataset.brief);
+    if (sz) { zeigeSzene(sz, true); try { KLANG.se('tap'); } catch (e) { } }
+  });
+}
+
+/* ---------- 8.6 badges for the court ---------- */
+(function () {
+  const hoechstesVertrauen = s => {
+    const b = (s.reich && s.reich.besuch) || {};
+    let m = 0; Object.keys(b).forEach(k => { if ((b[k] || 0) > m) m = b[k]; });
+    return m;
+  };
+  const briefe = s => ((s.reich && s.reich.post) || []).length;
+  BADGES.push(
+    { id: 'brief1', icon: '✉', name: 'Erster Brief', desc: 'Receive one letter', test: s => briefe(s) >= 1 },
+    { id: 'brief10', icon: '✎', name: 'Zehn Briefe', desc: '10 letters in the box', test: s => briefe(s) >= 10 },
+    { id: 'brief25', icon: '❦', name: 'Voller Kasten', desc: '25 letters in the box', test: s => briefe(s) >= 25 },
+    { id: 'vertraut', icon: '♡', name: 'Vertraut', desc: 'Vertrauen 10 with a princess', test: s => hoechstesVertrauen(s) >= 10 },
+    { id: 'herzens', icon: '♥', name: 'Herzenssache', desc: 'Vertrauen 30 with a princess', test: s => hoechstesVertrauen(s) >= 30 },
+    { id: 'tagwerk1', icon: '◷', name: 'Tagwerk', desc: 'All three daily tasks in one day', test: s => (s.tagwerk || 0) >= 1 },
+    { id: 'tagwerk7', icon: '◴', name: 'Sieben Tagwerke', desc: '7 full days of Tagwerk', test: s => (s.tagwerk || 0) >= 7 },
+    { id: 'schatz10', icon: '⬥', name: 'Schatzsucher', desc: 'Find 10 treasure words', test: s => (s.schatz || 0) >= 10 }
+  );
+})();
+
+/* ---------- 8.7 hooks ----------
+   Same technique section 7.11 uses: wrap, never rewrite. Every
+   wrapper runs the original untouched and then does its own work
+   inside a try, so a fault here can never take a drill down. */
+(function () {
+  const _start = startSession;
+  startSession = function () {
+    const alt = SESSION;
+    _start.apply(this, arguments);
+    try {
+      if (SESSION === alt || !SESSION || !SESSION.q.length) return;
+      spielInit();
+      SESSION.schatz = (S.tag.schatz || 0) < 2 ? Math.floor(Math.random() * SESSION.q.length) : -1;
+      SESSION.miss = 0;
+    } catch (e) { }
+  };
+
+  const _judge = judge;
+  judge = function () {
+    const s = SESSION;
+    let vor = null;
+    try {
+      if (s && !s.answered && s.cur) {
+        const rec = S.sched[SRS.key(s.cur.idx, s.cur.skill)];
+        vor = { neu: !rec, faellig: !!(rec && rec[1] <= today()), at: s.at };
+      }
+    } catch (e) { }
+    _judge.apply(this, arguments);
+    if (!vor || !s) return;
+    try {
+      spielInit();
+      S.tag.ans++;
+      const mark = s.marks[vor.at];
+      if (mark === 'r') {
+        S.tag.right++;
+        if ((s.combo || 0) > (S.tag.best || 0)) S.tag.best = s.combo;
+        if (vor.neu) S.tag.neu++;
+        if (vor.faellig) S.tag.faellig++;
+        schatzPruefen(vor.at);
+      }
+      zurufPruefen(mark);
+      pruefeTagwerk();
+      save();
+    } catch (e) { }
+  };
+
+  const _shaky = markShaky;
+  markShaky = function () {
+    const s = SESSION;
+    const schon = !s || s.shakyDone;
+    _shaky.apply(this, arguments);
+    if (schon) return;
+    try {
+      spielInit();
+      S.tag.shaky = (S.tag.shaky || 0) + 1;
+      pruefeTagwerk();
+      save();
+    } catch (e) { }
+  };
+
+  const _end = endSession;
+  endSession = function () {
+    const s = SESSION;
+    const fertig = !!(s && s.q && s.q.length && s.at >= s.q.length);
+    const pct = fertig ? s.right / s.q.length : 0;
+    const pk = PACK.id;
+    let vorWach = 0, vorSchlaf = false, vorStufe = null, warFokus = false, erst = true;
+    try {
+      spielInit();
+      const p = PROVINZ.find(x => x.pack === pk) || tended();
+      vorWach = S.reich.wach[pk] || 0;
+      vorSchlaf = schlaeft(p, provStat(p, true));
+      vorStufe = S.reich.stufe[pk];
+      warFokus = !!FOCUS;
+      erst = (S.sessions | 0) === 0;
+    } catch (e) { }
+
+    _end.apply(this, arguments);          // the original, plus reichAfter
+
+    if (!fertig) return;
+    try {
+      spielInit();
+      if (vorWach !== today()) S.reich.besuch[pk] = (S.reich.besuch[pk] || 0) + 1;
+      S.tag.sess++;
+      if (pct >= 0.9) S.tag.sauber++;
+      if (warFokus) S.tag.feld++;
+      pruefeTagwerk();
+      awardBadges();
+      save(true);
+      paintTagwerk();
+
+      const wachstum = vorStufe != null && (S.reich.stufe[pk] | 0) > vorStufe;
+      const ersterHeute = S.tag.sess === 1;
+      const tags = ['ende'];
+      if (erst) tags.push('erst');
+      if (vorSchlaf) tags.push('wach');
+      if (wachstum) tags.push('wachstum');
+      if (ersterHeute) tags.push('tag');
+      const laune = pct >= 0.9 ? 'gut' : pct >= 0.65 ? 'ok' : 'mies';
+      const spezial = erst || vorSchlaf || wachstum || ersterHeute;
+      const seit = S.sessions - (S.reich.szeneBei || 0);
+      if (!spezial && seit < 2) return;
+      setTimeout(function () {
+        try {
+          const ende = $('#sessionEnd');
+          if (!ende || ende.classList.contains('hide')) return;   // you already moved on
+          if (Hof.offen()) return;
+          versucheSzene(jetztKontext(tags), laune);
+        } catch (e) { }
+      }, 1200);
+    } catch (e) { }
+  };
+
+  const _heute = paintHeute;
+  paintHeute = function () { try { heileProfil(); spielInit(); } catch (e) { } _heute.apply(this, arguments); try { paintTagwerk(); } catch (e) { } };
+
+  const _reich = paintReich;
+  paintReich = function () { _reich.apply(this, arguments); try { paintHofExtra(); } catch (e) { } };
+
+  const _boot = boot;
+  boot = async function () {
+    await _boot.apply(this, arguments);
+    try { nachBoot(); } catch (e) { }
+  };
+})();
+
+/* One window on the first opening of a new day — never on your very
+   first visit, never on top of a running drill, never twice. */
+function nachBoot() {
+  if (!window.Hof) return;
+  spielInit();
+  paintTagwerk();
+  if (!(S.sessions > 0)) return;
+  if (S.reich.gruss === today()) return;
+  S.reich.gruss = today();
+  save();
+  setTimeout(function () {
+    try {
+      if (VIEW !== 'heute' || Hof.offen()) return;
+      const run = $('#sessionRun');
+      if (run && !run.classList.contains('hide')) return;
+      versucheSzene(jetztKontext(['tag']), 'ok');
+    } catch (e) { }
+  }, 1600);
+}
+
 boot();
 </script></body></html>

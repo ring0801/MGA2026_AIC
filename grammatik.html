@@ -3521,7 +3521,12 @@ const NAV = (() => {
    own key, so nothing here can push a vocabulary card around.
    ============================================================ */
 const DAY = 86400000;
-const today = () => Math.floor(Date.now() / DAY);
+/* The reader's day, not Greenwich's. Date.now() is UTC, so dividing it by a
+   day put the rollover at UTC midnight — 09:00 in Tokyo, 19:00 in New York.
+   Shifting by the local offset first makes a day mean the day you are living
+   in. Every page that writes to the shared profile uses this same definition;
+   they must never disagree, or one of them will think it is tomorrow. */
+const today = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / DAY);
 
 const mem = {};
 let STORE_MODE = 'memory';
@@ -4143,6 +4148,7 @@ async function boot() {
   if (p) S = Object.assign(JSON.parse(JSON.stringify(P_DEFAULT)), p);
   const g = await STORE.get(K_GRAM);
   if (g) G = Object.assign(JSON.parse(JSON.stringify(G_DEFAULT)), g);
+  if (S.lastDay > today()) S.lastDay = today();   /* see the note on today() */
   if (S.lastDay && today() - S.lastDay > 1) S.streak = 0;
 
   $$('nav.tabs button').forEach(b => b.onclick = () => {

@@ -147,6 +147,7 @@ h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:upp
 body{overflow-x:clip}
 .top-row{gap:8px;min-width:0}
 .top-row .chip{flex:0 0 auto}
+.top-row .mark{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .xplabel{gap:10px}
 .xplabel span{flex:0 0 auto}
 .xplabel .rnk{flex:1 1 auto;min-width:0;text-align:center;color:var(--gelb);
@@ -214,8 +215,49 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
   a.prov:nth-child(3):hover{transform:translateY(-8px)}
   a.prov:nth-child(5):hover{transform:translateY(8px)}
 }
+
+/* ============ DER HOF ============ */
+.tagwerk .tw{display:flex;flex-direction:column;gap:9px;margin-top:2px}
+.twr{display:flex;align-items:center;gap:10px}
+.twk{flex:none;width:14px;text-align:center;font-family:var(--mono);font-size:13px;color:var(--ink-40)}
+.twr.ok .twk{color:var(--gruen)}
+.twn{flex:1 1 auto;min-width:0}
+.twn b{display:block;font-weight:500;font-size:14.5px;line-height:1.2;overflow-wrap:break-word}
+.twn s{display:block;text-decoration:none;font-family:var(--mono);font-size:10px;color:var(--ink-40);margin-top:1px}
+.twr.ok .twn b{color:var(--ink-60)}
+.twr2{flex:none;display:flex;align-items:center;gap:8px}
+.twb{display:block;width:54px;height:6px;background:var(--paper-2);border-radius:3px;overflow:hidden}
+.twb i{display:block;height:100%;background:var(--blau);border-radius:3px;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.twr.ok .twb i{background:var(--gruen)}
+.twz{font-family:var(--mono);font-size:10.5px;color:var(--ink-40);white-space:nowrap}
+.tws{font-family:var(--mono);font-size:11px;color:var(--gelb);white-space:nowrap}
+@media(max-width:344px){.twb{width:30px}.twn s{display:none}}
+
+.vtr{display:flex;flex-direction:column;gap:5px;padding:10px 0;border-top:1px solid var(--line)}
+.vcard .vtr:first-of-type{border-top:none;padding-top:3px}
+.vh{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.vh i{width:9px;height:9px;border-radius:2px;flex:none}
+.vh b{font-family:var(--disp);font-size:18px;letter-spacing:.01em}
+.vh s{text-decoration:none;font-family:var(--mono);font-size:10.5px;color:var(--ink-40)}
+.vb{display:block;height:6px;background:var(--paper-2);border-radius:3px;overflow:hidden}
+.vb i{display:block;height:100%;border-radius:3px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.vm{font-family:var(--mono);font-size:10.5px;color:var(--ink-60)}
+
+.briefe{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(226px,1fr));margin-top:4px}
+.brief{display:flex;flex-direction:column;gap:5px;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;
+  transition:border-color .15s,transform .1s}
+.brief:hover{border-color:var(--ink-40)}
+.brief:active{transform:translateY(1px)}
+.bh{display:flex;align-items:center;gap:6px}
+.bh i{width:8px;height:8px;border-radius:2px;flex:none}
+.bh b{font-family:var(--disp);font-size:15px;letter-spacing:.01em}
+.bh s{margin-left:auto;text-decoration:none;font-family:var(--mono);font-size:9.5px;color:var(--ink-40);white-space:nowrap}
+.bt{font-size:12.5px;line-height:1.4;color:var(--ink-60)}
+@media(prefers-reduced-motion:reduce){.brief:active{transform:none}}
 </style>
 <script src="season.js"></script>
+<script src="hof.js"></script>
 </head>
 <body>
 
@@ -245,6 +287,8 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
   <div id="resumeTxt" style="font-size:15px"></div>
 </div>
 
+<div id="tagwerk" class="hide" style="margin-top:14px"></div>
+
 <section>
   <p class="eyebrow" id="motto" style="margin-top:18px"></p>
   <h2 class="sec" style="margin-top:0" data-t="routeH"></h2>
@@ -260,6 +304,12 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
   <p class="muted" data-t="reichP"></p>
   <div class="hofline" id="hofLine"></div>
   <div class="karte" id="reichKarte"></div>
+</section>
+
+<section id="hofSecWrap" class="hide">
+  <h2 class="sec" data-t="hofH"></h2>
+  <p class="muted" data-t="hofP"></p>
+  <div id="hofSec"></div>
 </section>
 
 <section>
@@ -331,6 +381,17 @@ const T = {
     sideP1: 'The main road is paved and everyone on it is in a hurry. But there is a gap in the hedge past the last milestone, and beyond it a rutted lane winds off between the fields.',
     sideP2: 'Six girls work six farms, and between them they hold every rule of German grammar the way you hold a tool you use daily.',
 
+
+    hofH: 'The court',
+    hofP: 'Six women, six tempers, and not one of them is a mood ring for your score. They write to you when you have earned the day; Die Post keeps every letter, and you can read them all again whenever you like.',
+    tagwerkEyebrow: 'Tagwerk \u00b7 what counts today',
+    twFoot: '{n} of 3 done \u00b7 set by the calendar, never rerolled',
+    vEyebrow: 'Closeness \u00b7 one point per day, never per answer',
+    vLine: 'Closeness {v} \u00b7 {a}/{b} letters read',
+    vNote: 'Closeness grows only when you finish a round on a new day. It cannot be bought and cannot be caught up on \u2014 which is exactly why she tells you more as the weeks go by.',
+    postEyebrow: 'Die Post \u00b7 {n} letters',
+    postEmpty: 'Nothing has arrived yet. Finish a round inside a Paket \u2014 she writes of her own accord.',
+    noProv: 'No province opened yet.',
     badgesH: 'Badges',
     badgesP: 'Everything you have carried home, from every road and every lane.',
     seasonEyebrow: 'The turning year',
@@ -385,6 +446,17 @@ const T = {
     sideP1: 'Die Hauptstraße ist gepflastert, und alle darauf haben es eilig. Aber hinter dem letzten Meilenstein ist eine Lücke in der Hecke, und dahinter windet sich ein Feldweg zwischen die Äcker.',
     sideP2: 'Sechs Mädchen bewirtschaften sechs Höfe, und zusammen halten sie jede Regel der deutschen Grammatik so in der Hand wie ein Werkzeug, das man täglich benutzt.',
 
+
+    hofH: 'Der Hof',
+    hofP: 'Sechs Frauen, sechs Temperamente \u2014 und keine davon ist ein Stimmungsbarometer f\u00fcr deine Punktzahl. Sie schreiben dir, wenn du den Tag verdient hast. Die Post hebt jeden Brief auf, und du kannst alles jederzeit noch einmal lesen.',
+    tagwerkEyebrow: 'Tagwerk \u00b7 was heute z\u00e4hlt',
+    twFoot: '{n} von 3 erledigt \u00b7 vom Kalender bestimmt, nie neu gew\u00fcrfelt',
+    vEyebrow: 'Vertrauen \u00b7 ein Punkt pro Tag, nie pro Antwort',
+    vLine: 'Vertrauen {v} \u00b7 {a}/{b} Briefe gelesen',
+    vNote: 'Vertrauen w\u00e4chst nur, wenn du an einem neuen Tag eine Runde beendest. Es l\u00e4sst sich nicht kaufen und nicht nachholen \u2014 genau deshalb erz\u00e4hlt sie dir mit den Wochen mehr.',
+    postEyebrow: 'Die Post \u00b7 {n} Briefe',
+    postEmpty: 'Noch nichts angekommen. Beende eine Runde in einem Paket \u2014 sie meldet sich von selbst.',
+    noProv: 'Noch keine Provinz ge\u00f6ffnet.',
     badgesH: 'Abzeichen',
     badgesP: 'Alles, was du heimgetragen hast — von jeder Straße und jedem Feldweg.',
     seasonEyebrow: 'Das wandernde Jahr',
@@ -504,6 +576,15 @@ const BADGE_META = {
   w500: { icon: '◈', name: 'A2-Schwelle', nameEn: 'A2 threshold', desc: '500 Wörter gelernt', descEn: '500 words learned' },
   m50: { icon: '♛', name: 'Meisterhaft', nameEn: 'Masterful', desc: '50 Wörter gemeistert', descEn: '50 words mastered' },
   year: { icon: '❈', name: 'Vier Jahreszeiten', nameEn: 'Four seasons', desc: 'Ein ganzes Jahr durchlaufen', descEn: 'Passed through a full year' },
+  // the court
+  brief1: { icon: '\u2709', name: 'Erster Brief', nameEn: 'First letter', desc: 'Einen Brief bekommen', descEn: 'Receive one letter' },
+  brief10: { icon: '\u270e', name: 'Zehn Briefe', nameEn: 'Ten letters', desc: '10 Briefe im Kasten', descEn: '10 letters in the box' },
+  brief25: { icon: '\u2766', name: 'Voller Kasten', nameEn: 'A full box', desc: '25 Briefe im Kasten', descEn: '25 letters in the box' },
+  vertraut: { icon: '\u2661', name: 'Vertraut', nameEn: 'Close', desc: 'Vertrauen 10 bei einer Prinzessin', descEn: 'Closeness 10 with a princess' },
+  herzens: { icon: '\u2665', name: 'Herzenssache', nameEn: 'A matter of the heart', desc: 'Vertrauen 30 bei einer Prinzessin', descEn: 'Closeness 30 with a princess' },
+  tagwerk1: { icon: '\u25f7', name: 'Tagwerk', nameEn: 'A day\u2019s work', desc: 'Alle drei Tagesaufgaben an einem Tag', descEn: 'All three daily tasks in one day' },
+  tagwerk7: { icon: '\u25f4', name: 'Sieben Tagwerke', nameEn: 'Seven days\u2019 work', desc: '7 volle Tagwerke', descEn: '7 full days of Tagwerk' },
+  schatz10: { icon: '\u2b25', name: 'Schatzsucher', nameEn: 'Treasure hunter', desc: '10 Schatzw\u00f6rter gefunden', descEn: 'Find 10 treasure words' },
   // the lane
   gstart: { icon: '🌾', name: 'Feldweg', nameEn: 'The Lane', desc: 'Eine Runde auf dem Feldweg', descEn: 'One round on the farm lane' },
   g100: { icon: '✦', name: 'Hundert', nameEn: 'Hundred', desc: '100 Grammatikaufgaben richtig', descEn: '100 grammar answers right' },
@@ -537,7 +618,12 @@ const MOTTOS = [
 ];
 
 const DAY = 86400000;
-const today = () => Math.floor(Date.now() / DAY);
+/* The reader's day, not Greenwich's. Date.now() is UTC, so dividing it by a
+   day put the rollover at UTC midnight — 09:00 in Tokyo, 19:00 in New York.
+   Shifting by the local offset first makes a day mean the day you are living
+   in. Every page that writes to the shared profile uses this same definition;
+   they must never disagree, or one of them will think it is tomorrow. */
+const today = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / DAY);
 const esc = s => (s + '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function levelOf(xp) { let L = 1, need = 100, acc = 0; while (xp >= acc + need) { acc += need; L++; need = 100 + (L - 1) * 60; } return { L, into: xp - acc, need }; }
 function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 1800); }
@@ -1175,6 +1261,98 @@ function paintFeldweg(gram) {
     '</div>';
 }
 
+
+/* ============================================================
+   DER HOF, from the hub — the same court, read only.
+
+   The hub never writes, so nothing here can earn anything: it
+   shows the day's three tasks as the Paket left them, how well
+   each princess knows you, and the whole letter box, re-readable.
+   If hof.js is not present the section simply is not there.
+   ============================================================ */
+function paintTagwerk(P) {
+  const el = document.getElementById('tagwerk');
+  if (!el) return;
+  if (!window.Hof) { el.classList.add('hide'); return; }
+  const tag = (P && P.tag && P.tag.d === today()) ? P.tag : {};
+  const done = tag.done || [];
+  const plan = Hof.tagesplan(today());
+  const fertig = plan.filter(a => done.indexOf(a.id) > -1).length;
+  el.className = 'panel tagwerk';
+  el.innerHTML =
+    '<p class="eyebrow">' + t('tagwerkEyebrow') + '</p>' +
+    '<div class="tw">' + plan.map(a => {
+      const s = Hof.stand(a, tag), fin = done.indexOf(a.id) > -1;
+      const pct = Math.round(100 * s.have / s.ziel);
+      return '<div class="twr' + (fin ? ' ok' : '') + '">' +
+        '<span class="twk">' + (fin ? '\u2713' : '\u00b7') + '</span>' +
+        '<span class="twn"><b>' + esc(LANG === 'de' ? a.de : a.en) + '</b>' +
+        '<s>' + esc(LANG === 'de' ? a.en : a.de) + '</s></span>' +
+        '<span class="twr2"><span class="twb"><i style="width:' + pct + '%"></i></span>' +
+        '<span class="twz">' + s.have + '/' + s.ziel + '</span>' +
+        '<span class="tws">\u2726' + a.stern + '</span></span></div>';
+    }).join('') + '</div>' +
+    '<p class="tiny" style="margin:9px 0 0">' + t('twFoot', { n: fertig }) + '</p>';
+}
+
+function briefDatum(d) {
+  return d === 0 ? t('agoToday') : d === 1 ? t('agoYesterday') : t('agoDays', { n: d });
+}
+
+function paintHofSec(P) {
+  const wrap = document.getElementById('hofSecWrap');
+  const host = document.getElementById('hofSec');
+  if (!wrap || !host) return;
+  if (!window.Hof) { wrap.classList.add('hide'); return; }
+  wrap.classList.remove('hide');
+
+  const R = (P && P.reich) || {};
+  const besuch = R.besuch || {}, gesehen = R.gesehen || [], kleid = R.kleid || {};
+  const post = (R.post || []).filter(e => e && Hof.szene(e.id));
+  const packs = DATA.packs || {};
+
+  const zeilen = PROVINZ.filter(p => !!packs[p.pack]).map(p => {
+    const per = Hof.PERSON[p.pack] || {};
+    const v = besuch[p.pack] || 0, b = Hof.bestand(p.pack, gesehen);
+    const pct = Math.min(100, Math.round(100 * v / 30));
+    return '<div class="vtr">' +
+      '<span class="vh"><i style="background:' + p.col + '"></i><b>' + esc(p.her) + '</b>' +
+      '<s>' + esc((LANG === 'de' ? per.art : per.artEn) || '') + '</s></span>' +
+      '<span class="vb"><i style="width:' + pct + '%;background:' + p.col + '"></i></span>' +
+      '<span class="vm">' + t('vLine', { v: v, a: b.gelesen, b: b.total }) + '</span></div>';
+  }).join('');
+
+  const liste = post.slice(0, 18).map(e => {
+    const sz = Hof.szene(e.id), per = Hof.PERSON[sz.pack] || {};
+    const roh = (sz.de || '').replace(/\s+/g, ' ').trim();
+    const kurz = roh.length > 74 ? roh.slice(0, 74) + '\u2026' : roh;
+    return '<button class="brief" data-brief="' + esc(sz.id) + '">' +
+      '<span class="bh"><i style="background:' + (per.col || '#8A8F96') + '"></i>' +
+      '<b>' + esc(per.her || '') + '</b><s>' + briefDatum(today() - (e.t || 0)) + '</s></span>' +
+      '<span class="bt">' + esc(kurz) + '</span></button>';
+  }).join('');
+
+  host.innerHTML =
+    '<div class="panel vcard"><p class="eyebrow">' + t('vEyebrow') + '</p>' +
+    (zeilen || '<p class="muted" style="margin:0">' + t('noProv') + '</p>') +
+    '<p class="tiny" style="margin:10px 0 0">' + t('vNote') + '</p></div>' +
+    '<div class="panel vcard"><p class="eyebrow">' + t('postEyebrow', { n: post.length }) + '</p>' +
+    (liste ? '<div class="briefe">' + liste + '</div>'
+      : '<p class="muted" style="margin:0">' + t('postEmpty') + '</p>') + '</div>';
+
+  host.querySelectorAll('[data-brief]').forEach(b => b.onclick = () => {
+    const sz = Hof.szene(b.dataset.brief);
+    if (!sz) return;
+    const p = PROVINZ.find(x => x.pack === sz.pack) || PROVINZ[0];
+    const rec = packs[sz.pack] || {};
+    Hof.fenster(sz, {
+      lang: LANG, replay: true, accent: p.col,
+      portrait: spriteSVG(stufeOf(rec.learned || 0, rec.total || 0), p.col, { px: 7, worn: kleid[sz.pack] || [] })
+    });
+    KLANG.se('tap');
+  });
+}
+
 let DATA = { profile: {}, packs: {}, gram: {} };
 
 function render() {
@@ -1187,6 +1365,8 @@ function render() {
   paintReich(DATA.profile, packs);
   paintPacks(packs);
   paintFeldweg(DATA.gram);
+  paintTagwerk(DATA.profile);
+  paintHofSec(DATA.profile);
   paintBadges(DATA.profile.badges);
   if (window.Season) Season.apply(DATA.profile.answers || 0, { announce: false });
   const modeTxt = { account: t('storeAccount'), device: t('storeDevice'), memory: t('storeMemory') };
