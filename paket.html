@@ -14,8 +14,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wortwerk">
 <meta name="theme-color" content="#16181D">
-<link rel="apple-touch-icon" href="icon180.png">
-<link rel="icon" href="icon180.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
 <title>Wortwerk</title>
 <!-- No external requests. Nothing about your use of this app leaves the device.
      To restore the original Barlow Condensed / IBM Plex typography, delete the
@@ -5620,7 +5620,12 @@ const REALM = {
     R.gesehen = liste('g');
     R.post = liste('p').map(e => {
       const c = e.lastIndexOf('.');
-      return { id: e.slice(0, c), pack: PACK.id, t: parseInt(e.slice(c + 1), 36) || 0 };
+      const id = e.slice(0, c);
+      /* The code does not carry which province a postcard came from, and
+         stamping it with the one you happen to be standing in files Adelheid's
+         letters under Berenike. The scene itself knows; ask it. */
+      const sz = (window.Hof && Hof.szene) ? Hof.szene(id) : null;
+      return { id, pack: (sz && sz.pack) || PACK.id, t: parseInt(e.slice(c + 1), 36) || 0 };
     }).filter(e => e.id);
     R.wahl = {};
     liste('w').forEach(e => { const c = e.lastIndexOf('.'); R.wahl[e.slice(0, c)] = +e.slice(c + 1) || 0; });
@@ -6898,8 +6903,18 @@ function mergeCode(txt) {
   const sync = S.sync, len = S.len, plan = S.plan;
   S = CODE.merge(S, incoming);
   S.sync = sync; S.len = len; S.plan = plan;
-  save(true); paintHeader(); paintStrecke();
-  toast('Merged · ' + (Object.keys(S.sched).length - before) + ' new items');
+  save(true); paintHeader(); paintStrecke(); paintHeute();
+  const neu = Object.keys(S.sched).length - before;
+  /* Say where it landed. The records are keyed by word, not by province, so a
+     code made in one place restores into that place — which is invisible if you
+     are standing somewhere else, and reads as a failed import. */
+  let hier = 0;
+  const meine = new Set(LEX.map(w => w.de + '~' + w.pos));
+  Object.keys(incoming.sched || {}).forEach(k => {
+    if (meine.has(k.slice(0, k.lastIndexOf(':')))) hier++;
+  });
+  toast(neu + ' neu · ' + hier + ' davon in ' + ORT.land +
+        (hier === 0 && neu > 0 ? ' — der Rest liegt in anderen Provinzen' : ''));
 }
 
 

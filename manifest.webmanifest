@@ -1,7 +1,6 @@
 {
   "name": "Wortwerk",
   "short_name": "Wortwerk",
-  "description": "Deutscher Wortschatz bis C2 — ein Weg durch acht Provinzen.",
   "lang": "de",
   "start_url": "./index.html",
   "scope": "./",
@@ -10,8 +9,10 @@
   "background_color": "#F4F1EA",
   "theme_color": "#1A1A1A",
   "icons": [
-    { "src": "icon180.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "icon512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icon512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
   ]
 }
