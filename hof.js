@@ -83,6 +83,24 @@
         mies: [['Auch Kronen verrutschen.', 'Crowns slip too.'], ['Ohne Zeremonie: weiter.', 'No ceremony: continue.'], ['Geschenkt.', 'Let it go.']],
         ende: [['Das Ende des Saals.', 'The end of the hall.'], ['Noch ein Schritt.', 'One more step.']]
       }
+    },
+    p7: {
+      her: 'Gundula', land: 'Schenke', code: 'C2', col: '#B5651D',
+      art: 'laut, schnell, nicht zu beeindrucken', artEn: 'loud, quick, hard to impress',
+      ruf: {
+        gut: [['Sitzt.', 'That sticks.'], ['Na also.', 'There you go.'], ['Geht doch!', 'See, you can!']],
+        mies: [['Halb so wild.', 'Not the end of the world.'], ['Trink einen Schluck.', 'Have a sip.'], ['Nächste Runde.', 'Next round.']],
+        ende: [['Letzte Runde.', 'Last round.'], ['Gleich Feierabend.', 'Nearly closing time.']]
+      }
+    },
+    p8: {
+      her: 'Henriette', land: 'Schmiede', code: 'C2', col: '#5D6D7E',
+      art: 'geduldig, genau im Maß, laut bei der Arbeit', artEn: 'patient, exact in her measures, loud at work',
+      ruf: {
+        gut: [['Hält.', 'That holds.'], ['Sauber geschweißt.', 'Cleanly welded.'], ['Das trägt.', 'That will bear weight.']],
+        mies: [['Nochmal ins Feuer.', 'Back in the fire.'], ['Zu kalt geschlagen.', 'Struck it too cold.'], ['Weiter.', 'Carry on.']],
+        ende: [['Das Feuer geht aus.', 'The fire is going out.'], ['Ein Schlag noch.', 'One more strike.']]
+      }
     }
   };
 
@@ -511,6 +529,86 @@
       id: 'fri-gabe', pack: 'p6', typ: 'gabe', ab: 5, gabe: 3,
       de: 'Nimm den Ring. Nein, kein Schmuck — sieh hinein, da steht ein Wort.\n\n«Es ist kein besonderes Wort. Aber es steht innen, wo nur ich es sehe. Jetzt siehst du es auch.»',
       en: 'Take the ring. No, not jewellery — look inside, there is a word engraved.\n\n"It is not a special word. But it is on the inside, where only I can see it. Now you see it too."'
+    },
+    {
+      id: 'gun-hallo', pack: 'p7', typ: 'gespraech', wann: 'erst', ab: 0,
+      de: 'Setz dich, wo Platz ist, und red nicht so gestochen. Gundula.\n\nHier drin sagt keiner «nichtsdestotrotz». Wer das sagt, zahlt eine Runde.',
+      en: 'Sit wherever there is room, and stop talking like a document. Gundula.\n\nNobody in here says "notwithstanding". Whoever does buys a round.'
+    },
+    {
+      id: 'gun-abend', pack: 'p7', typ: 'szene', wann: 'tag', ab: 0,
+      de: 'Sechs Uhr, und schon voll. Gundula zapft, hört vier Gespräche gleichzeitig und wirft in jedes genau ein Wort.\n\nJedes Mal lachen alle. Sie hat nichts davon vorbereitet.',
+      en: 'Six o\u2019clock and already full. Gundula pulls pints, follows four conversations at once and drops exactly one word into each.\n\nEvery time, everyone laughs. She prepared none of it.'
+    },
+    {
+      id: 'gun-nacht', pack: 'p7', typ: 'szene', wann: 'nacht', ab: 0,
+      de: 'Nach Mitternacht wird es leise. Gundula wischt den Tresen, immer dieselbe Runde, und summt etwas Altes.\n\n«Tagsüber rede ich für zwölf. Nachts ist mir das Wischen lieber.»',
+      en: 'After midnight it goes quiet. Gundula wipes the bar, the same circuit every time, humming something old.\n\n"In the daytime I talk for twelve. At night I would rather wipe."'
+    },
+    {
+      id: 'gun-wach', pack: 'p7', typ: 'gespraech', wann: 'wach', ab: 0,
+      de: 'Da bist du ja wieder. Ich hab schon gedacht, du bist zu fein geworden für uns.\n\nSetz dich. Und sag nicht «ich hätte da eine Frage». Frag einfach.',
+      en: 'There you are. I was starting to think you had got too refined for us.\n\nSit down. And do not say "I would have a question". Just ask.'
+    },
+    {
+      id: 'gun-frage', pack: 'p7', typ: 'frage', wann: 'tag', ab: 2,
+      de: 'Sag mal ehrlich: Verstehst du, was hier geredet wird, oder nickst du nur?\n\nKeine Schande. Am Anfang nickt jeder.',
+      en: 'Tell me honestly: do you follow what is said in here, or are you just nodding?\n\nNo shame in it. Everyone nods at the start.'
+    },
+    {
+      id: 'gun-warm', pack: 'p7', typ: 'szene', wann: 'warm', ab: 2,
+      de: 'Die Tür steht offen, die Tische stehen draußen. Gundula trägt sechs Gläser auf einmal und beschwert sich lautstark, dass niemand hilft.\n\nHilft ihr jemand, schickt sie ihn weg.',
+      en: 'The door is propped open, the tables are outside. Gundula carries six glasses at once and complains loudly that nobody helps.\n\nWhen somebody does, she sends them away.'
+    },
+    {
+      id: 'gun-kalt', pack: 'p7', typ: 'szene', wann: 'kalt', ab: 3,
+      de: 'Draußen Matsch, drinnen beschlagene Scheiben. Am Ofen sitzen drei, die sich seit vierzig Jahren streiten.\n\n«Die kommen nicht wegen des Biers», sagt Gundula. «Die kommen wegen des Streits.»',
+      en: 'Slush outside, misted windows inside. Three men sit by the stove who have been arguing for forty years.\n\n"They do not come for the beer," says Gundula. "They come for the argument."'
+    },
+    {
+      id: 'gun-gabe', pack: 'p7', typ: 'gabe', ab: 5, gabe: 3,
+      de: 'Der Deckel hier. Steht nichts drauf, aber er ist von meinem ersten Fass.\n\n«Behalt ihn. Wenn du je wieder anfängst, geschwollen zu reden, leg ihn dir hin.»',
+      en: 'This beer mat. Nothing written on it, but it came off my first barrel.\n\n"Keep it. If you ever start talking pompously again, put it in front of you."'
+    },
+    {
+      id: 'hen-hallo', pack: 'p8', typ: 'gespraech', wann: 'erst', ab: 0,
+      de: 'Nicht zu nah, es spritzt. Henriette.\n\nDie Leute glauben, hier werde Neues gemacht. Wird es nicht. Hier wird Vorhandenes anders zusammengesetzt, und das ist schwerer.',
+      en: 'Not too close, it spits. Henriette.\n\nPeople think new things get made here. They do not. Existing things get put together differently, and that is harder.'
+    },
+    {
+      id: 'hen-werk', pack: 'p8', typ: 'szene', wann: 'tag', ab: 0,
+      de: 'Sie legt dasselbe Stück viermal ins Feuer und schlägt jedes Mal woanders hin.\n\nVier Werkzeuge liegen am Ende auf der Bank. Das Eisen war immer dasselbe.',
+      en: 'She puts the same piece into the fire four times and strikes it in a different place each time.\n\nFour tools end up on the bench. The iron was the same throughout.'
+    },
+    {
+      id: 'hen-nacht', pack: 'p8', typ: 'szene', wann: 'nacht', ab: 0,
+      de: 'Die Esse glüht noch, obwohl niemand mehr arbeitet. Henriette sitzt davor und sortiert Nägel nach Länge.\n\n«Das muss nicht sein. Aber morgen früh greife ich, ohne hinzusehen.»',
+      en: 'The forge still glows though nobody is working. Henriette sits in front of it sorting nails by length.\n\n"It is not necessary. But tomorrow morning I will reach without looking."'
+    },
+    {
+      id: 'hen-wach', pack: 'p8', typ: 'gespraech', wann: 'wach', ab: 0,
+      de: 'Lange nicht gesehen. Das Eisen ist ausgekühlt, das macht nichts, es wird wieder heiß.\n\nNur nicht so tun, als wäre es nie kalt geworden. Damit fängt der Pfusch an.',
+      en: 'Long time. The iron has gone cold; no matter, it will heat again.\n\nJust do not pretend it never cooled. That is where botched work begins.'
+    },
+    {
+      id: 'hen-frage', pack: 'p8', typ: 'frage', wann: 'tag', ab: 2,
+      de: 'Zwei Wörter, gleicher Stamm, eine Silbe Unterschied. Merkst du, dass sie nicht dasselbe meinen?\n\nWenn ja, bist du weiter als die meisten.',
+      en: 'Two words, the same root, one syllable between them. Do you notice they do not mean the same thing?\n\nIf you do, you are further along than most.'
+    },
+    {
+      id: 'hen-wachstum', pack: 'p8', typ: 'szene', wann: 'wachstum', ab: 2,
+      de: 'Sie hält dein Wort gegen das Licht und dreht es langsam.\n\n«Vorne stimmt es. Hinten auch. In der Mitte hast du geraten.» Sie legt es zurück ins Feuer.',
+      en: 'She holds your word up to the light and turns it slowly.\n\n"The front is right. The back too. In the middle you guessed." She puts it back in the fire.'
+    },
+    {
+      id: 'hen-kalt', pack: 'p8', typ: 'szene', wann: 'kalt', ab: 3,
+      de: 'Im Winter kommen alle zur Schmiede, angeblich wegen der Werkzeuge.\n\nHenriette sagt nichts dazu und legt zwei Scheite mehr nach als nötig.',
+      en: 'In winter everyone comes to the forge, ostensibly about tools.\n\nHenriette says nothing about it and puts on two more logs than she needs.'
+    },
+    {
+      id: 'hen-gabe', pack: 'p8', typ: 'gabe', ab: 5, gabe: 3,
+      de: 'Nimm den Meißel. Der Griff ist abgegriffen, das ist Absicht — meiner war es auch.\n\n«Ein neues Werkzeug taugt nichts. Es muss erst wissen, wem es gehört.»',
+      en: 'Take the chisel. The handle is worn, which is deliberate — mine was too.\n\n"A new tool is no use. It has to learn whose it is first."'
     }
   ];
 

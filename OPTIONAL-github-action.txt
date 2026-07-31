@@ -1,0 +1,91 @@
+-- OPTIONAL. Only add this if you want to edit lex/*.txt from the GitHub web
+-- interface (or your phone) and have the site rebuild itself.
+--
+-- The tradeoff, stated plainly: using this means switching Pages from
+-- "Deploy from a branch" to "GitHub Actions" in Settings > Pages. After that,
+-- what is deployed is what this workflow builds, not what is sitting in the
+-- branch. That is fine — but it does mean paket.html in the repo can drift
+-- from the deployed one until you next build locally.
+--
+-- If you would rather keep repo == deployed, do not use this. Build locally,
+-- commit the result, and leave Pages on "Deploy from a branch". That is the
+-- simpler setup and it is what I would pick.
+--
+-- To use: save the block below as .github/workflows/build.yml
+
+name: Build and deploy Wortwerk
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # build_app.py uses only the standard library, so there is nothing to install
+      - name: Build the road
+        run: python3 build_app.py --src . --lex lex --no-backup
+
+      # a build that silently produced broken JavaScript is worse than a failed
+      # one, so check every page parses before anything is published
+      - name: Check every page parses
+        run: |
+          python3 - <<'EOF'
+          import re, subprocess, sys
+          bad = 0
+          for f in ('index.html', 'paket.html', 'grammatik.html'):
+              src = open(f, encoding='utf-8').read()
+              js = '\n;\n'.join(re.findall(
+                  r'<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)</script>', src))
+              open('/tmp/c.js', 'w', encoding='utf-8').write(js)
+              r = subprocess.run(['node', '--check', '/tmp/c.js'],
+                                 capture_output=True, text=True)
+              print(('  ok   ' if r.returncode == 0 else '  FAIL ') + f)
+              if r.returncode: print(r.stderr); bad += 1
+          for f in ('pruefung.js', 'season.js', 'hof.js'):
+              r = subprocess.run(['node', '--check', f], capture_output=True, text=True)
+              print(('  ok   ' if r.returncode == 0 else '  FAIL ') + f)
+              if r.returncode: print(r.stderr); bad += 1
+          sys.exit(1 if bad else 0)
+          EOF
+
+      # lex/ and the builder are sources, not part of the site
+      - name: Stage the site
+        run: |
+          mkdir -p _site
+          cp index.html paket.html grammatik.html _site/
+          cp pruefung.js season.js hof.js _site/
+          cp manifest.webmanifest _site/
+          cp icon180.png icon512.png _site/
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -21,7 +21,10 @@
   'use strict';
   if (window.Season) return;                       // load once, even if included twice
 
-  var LEN = 200;                                   // questions per season
+  /* 200 for open-ended learning. A deadline plan runs at ten times the
+     volume across every Paket at once, so the host sets window.WW_SEASON_LEN
+     and the wheel keeps meaning something. */
+  function LEN() { return (typeof window !== 'undefined' && (window.WW_SEASON_LEN | 0)) || 200; }
   var STILL = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var LAST_KEY = 'wortwerk:season';                // remembers the last turn we announced
 
@@ -65,14 +68,14 @@
   /* ---------- the pure part: where are we on the wheel ---------- */
   function info(answers) {
     var n = Math.max(0, answers | 0);
-    var idx = Math.floor(n / LEN) % 4;
+    var idx = Math.floor(n / LEN()) % 4;
     var s = SEASONS[idx];
-    var into = n % LEN;
+    var into = n % LEN();
     return {
       idx: idx, key: s.key, de: s.de, en: s.en, ico: s.ico, accent: s.accent,
-      into: into, total: LEN, remaining: LEN - into,
-      pct: Math.round(100 * into / LEN),
-      year: Math.floor(n / (LEN * 4)) + 1,
+      into: into, total: LEN(), remaining: LEN() - into,
+      pct: Math.round(100 * into / LEN()),
+      year: Math.floor(n / (LEN() * 4)) + 1,
       next: SEASONS[(idx + 1) % 4]
     };
   }
@@ -253,7 +256,7 @@
     readAnswers(function (n) { if (!API._applied) apply(n, { announce: false }); });
   }
 
-  var API = { LEN: LEN, SEASONS: SEASONS, info: info, apply: apply, _applied: false };
+  var API = { get LEN() { return LEN(); }, SEASONS: SEASONS, info: info, apply: apply, _applied: false };
   window.Season = API;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoBoot);

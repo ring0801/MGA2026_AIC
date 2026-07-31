@@ -1,0 +1,4 @@
+# built output is committed, but never these
+*.bak-*
+__pycache__/
+.DS_Store

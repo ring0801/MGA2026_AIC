@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wortwerk">
 <meta name="theme-color" content="#16181D">
-<link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" href="icon-180.png">
+<link rel="apple-touch-icon" href="icon180.png">
+<link rel="icon" href="icon180.png">
 <title>Wortwerk — Der Feldweg</title>
 <!-- Side-quest. Same profile, same streak, same XP as every Paket; its own
      scheduler key, so grammar drills never disturb the vocabulary boxes.
@@ -504,6 +504,7 @@ body{overflow-x:clip}
   text-transform:uppercase;color:var(--ink-40);margin-top:3px}
 </style>
 <script src="season.js"></script>
+<script src="pruefung.js"></script>
 </head>
 <body>
 <header class="top">
@@ -4206,6 +4207,7 @@ async function boot() {
   tick(); setInterval(tick, 2000);
 
   paintHeader(); show('weg');
+  if (window.Pruefung) Pruefung.saison(S);   // same wheel as the Pakete
   if (window.Season) Season.apply(S.answers || 0, { toast: toast, se: KLANG.se, announce: false });
   const g2 = gesamt();
   if (G.sessions) toast('Welcome back — ' + g2.due + ' lesson' + (g2.due === 1 ? '' : 's') + ' due');

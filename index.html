@@ -14,8 +14,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wortwerk">
 <meta name="theme-color" content="#16181D">
-<link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" href="icon-180.png">
+<link rel="apple-touch-icon" href="icon180.png">
+<link rel="icon" href="icon180.png">
 <title>Wortwerk — Übersicht</title>
 <!-- No external requests. Nothing about your use of this app leaves the device.
      To restore the original Barlow Condensed / IBM Plex typography, delete the
@@ -64,6 +64,15 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;color:inhe
 .xplabel{max-width:732px;margin:4px auto 0;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:rgba(231,232,227,.6);text-transform:uppercase}
 
 /* ---------- generic blocks ---------- */
+#planStreifen{border-left:5px solid var(--gelb)}
+#planStreifen .pz{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px solid var(--line)}
+#planStreifen .pz:last-child{border-bottom:none}
+#planStreifen .pz b{font-weight:600}
+#planStreifen .pz s{text-decoration:none;color:var(--ink-40);font-family:var(--mono);font-size:12px}
+#planStreifen .pz em{font-style:normal;font-family:var(--mono);font-size:12px}
+#planStreifen .go{display:block;text-align:center;text-decoration:none;margin-top:12px;padding:13px 14px;
+  border-radius:var(--r);background:var(--ink);color:var(--paper);font-weight:700;font-size:16px}
+#planStreifen .go.fertig{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:600}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:14px}
 .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-40);margin:0 0 8px}
 h2.sec{font-family:var(--disp);font-size:27px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:26px 0 4px;line-height:1}
@@ -257,6 +266,7 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
 @media(prefers-reduced-motion:reduce){.brief:active{transform:none}}
 </style>
 <script src="season.js"></script>
+<script src="pruefung.js"></script>
 <script src="hof.js"></script>
 </head>
 <body>
@@ -274,6 +284,7 @@ a.prov:hover{border-color:var(--ink-40);transform:translateY(-2px)}
 </header>
 
 <main class="wrap">
+  <div id="planStreifen" class="hide"></div>
 
 <div class="storewarn hide" id="storeWarn"></div>
 
@@ -532,11 +543,14 @@ const STORE = {
    the rest light up on their own the moment they've been opened
    once — this list never needs editing to "notice" a new Paket. */
 const ROUTE = [
-  { id: 'p1', file: 'paket1.html', name: 'Paket 1 · Kernwortschatz', total: 1153, order: 1, built: true },
-  { id: 'p2', file: 'paket2.html', name: 'Paket 2', total: 1000, order: 2, built: false },
-  { id: 'p3', file: 'paket3.html', name: 'Paket 3', total: 1000, order: 3, built: false },
-  { id: 'p4', file: 'paket4.html', name: 'Paket 4', total: 1000, order: 4, built: false },
-  { id: 'p5', file: 'paket5.html', name: 'Paket 5', total: 1000, order: 5, built: false }
+  { id: 'p2', file: 'paket.html?p=p2', name: 'Paket 1 · Markt', total: 737, order: 1, built: true },
+  { id: 'p1', file: 'paket.html?p=p1', name: 'Paket 2 · Wurzel', total: 1153, order: 2, built: true },
+  { id: 'p5', file: 'paket.html?p=p5', name: 'Paket 3 · Turm', total: 267, order: 3, built: true },
+  { id: 'p3', file: 'paket.html?p=p3', name: 'Paket 4 · Fluss', total: 612, order: 4, built: true },
+  { id: 'p6', file: 'paket.html?p=p6', name: 'Paket 5 · Krone', total: 316, order: 5, built: true },
+  { id: 'p7', file: 'paket.html?p=p7', name: 'Paket 6 · Schenke', total: 280, order: 6, built: true },
+  { id: 'p4', file: 'paket.html?p=p4', name: 'Paket 7 · Hügel', total: 318, order: 7, built: true },
+  { id: 'p8', file: 'paket.html?p=p8', name: 'Paket 8 · Schmiede', total: 238, order: 8, built: true }
 ];
 
 const STATIONS = [['A1', 500], ['A2', 1200], ['B1', 2700], ['B2', 5500], ['C1', 10500], ['C2', 21000]];
@@ -666,12 +680,14 @@ function paintRail(learnedTotal) {
    and travel.
    ============================================================ */
 const PROVINZ = [
-  { pack: 'p1', code: 'A1', land: 'Wurzel', col: '#6A4CE0', her: 'Adelheid' },
-  { pack: 'p2', code: 'A2', land: 'Markt', col: '#0A5FCE', her: 'Berenike' },
-  { pack: 'p3', code: 'B1', land: 'Fluss', col: '#1F9E63', her: 'Cordula' },
-  { pack: 'p4', code: 'B2', land: 'Hügel', col: '#29A3E0', her: 'Dorothea' },
-  { pack: 'p5', code: 'C1', land: 'Turm', col: '#E8A200', her: 'Elisabeth' },
-  { pack: 'p6', code: 'C2', land: 'Krone', col: '#CE3B2B', her: 'Friederike' }
+  { pack: 'p2', code: '1', land: 'Markt', col: '#0A5FCE', her: 'Berenike' },
+  { pack: 'p1', code: '2', land: 'Wurzel', col: '#6A4CE0', her: 'Adelheid' },
+  { pack: 'p5', code: '3', land: 'Turm', col: '#E8A200', her: 'Elisabeth' },
+  { pack: 'p3', code: '4', land: 'Fluss', col: '#1F9E63', her: 'Cordula' },
+  { pack: 'p6', code: '5', land: 'Krone', col: '#CE3B2B', her: 'Friederike' },
+  { pack: 'p7', code: '6', land: 'Schenke', col: '#B5651D', her: 'Gundula' },
+  { pack: 'p4', code: '7', land: 'Hügel', col: '#29A3E0', her: 'Dorothea' },
+  { pack: 'p8', code: '8', land: 'Schmiede', col: '#5D6D7E', her: 'Henriette' }
 ];
 const SCHLAF = 40;
 const RUHE = 3;
@@ -840,10 +856,11 @@ function paintReich(profile, packs) {
 
   const read = p => {
     const rec = packs[p.pack];
-    if (!rec) return { built: false, learned: 0, total: 0, mastered: 0, due: 0 };
+    if (!rec) return { built: false, learned: 0, total: 0, mastered: 0, due: 0, kosten: null };
     return {
       built: true, learned: rec.learned || 0, total: rec.total || 0,
-      mastered: rec.mastered || 0, due: rec.due || 0, at: rec.at
+      mastered: rec.mastered || 0, due: rec.due || 0, at: rec.at,
+      kosten: rec.kosten === undefined ? null : rec.kosten
     };
   };
 
@@ -884,7 +901,13 @@ function paintReich(profile, packs) {
     const inner =
       '<span class="ph"><i class="pdot" style="background:' + (st.built ? (sl ? '#9C9B93' : p.col) : '#C6C9C1') + '"></i>' +
       '<b>' + p.code + ' · ' + p.land + '</b></span>' +
-      '<span class="pn">' + (st.built ? (sl ? t('asleepDue', { n: st.due }) : p.her + ' · ' + stufeName(stu)) : t('notYet')) + '</span>' +
+      /* a pack the plan cannot afford is not being neglected, it is being
+         deferred on purpose — say which */
+      '<span class="pn">' + (st.built
+        ? (st.kosten === 0 && st.kosten !== null && DATA.profile.pruef && DATA.profile.pruef.on
+            ? 'außerhalb des Plans'
+            : sl ? t('asleepDue', { n: st.due }) : p.her + ' · ' + stufeName(stu))
+        : t('notYet')) + '</span>' +
       '<span class="pbar"><i style="width:' + pct + '%;background:' + (sl ? '#9C9B93' : p.col) + '"></i></span>' +
       '<span class="pm">' + (st.built ? st.learned + ' / ' + st.total + ' · ' + t('masteredN', { n: st.mastered }) : '&nbsp;') + '</span>' +
       '<span class="pfoot">' + scene + '</span>' +
@@ -900,7 +923,8 @@ function paintPacks(packs) {
   // any pack that has ever been opened is "built", roadmap or not.
   const known = new Set(ROUTE.map(r => r.id));
   const extra = Object.keys(packs).filter(id => !known.has(id)).map(id => ({
-    id, file: 'paket' + id.replace(/\D/g, '') + '.html',
+    /* one file now — a pack the roadmap has not heard of is still reachable */
+    id, file: 'paket.html?p=' + id,
     name: packs[id].name || id, total: packs[id].total || 0,
     order: 90 + Object.keys(packs).indexOf(id), built: true
   }));
@@ -1355,9 +1379,53 @@ function paintHofSec(P) {
 
 let DATA = { profile: {}, packs: {}, gram: {} };
 
+/* One glance, one action. The hub totals what every Paket published and
+   points at the single file that still owes work — the commonest thing to
+   want on opening the app, and previously the hardest to find out. */
+function paintPlan(packs) {
+  const el = document.getElementById('planStreifen');
+  const u = (window.Pruefung && Pruefung.uebersicht)
+    ? Pruefung.uebersicht(DATA.profile, packs, today()) : null;
+  if (!u) { el.className = 'hide'; return; }
+  el.className = 'panel';
+  el.style.borderLeft = '5px solid var(--gelb)';
+
+  const ziel = u.zeilen.find(z => z.aktuell && z.rest > 0)
+            || u.zeilen.find(z => !z.aktuell && z.kosten > 0)
+            || u.zeilen.find(z => z.kosten > 0);
+  const route = ziel ? ROUTE.find(r => r.id === ziel.id) : null;
+  const fertig = u.zeilen.length > 0 && u.rest === 0 && u.veraltet === 0;
+
+  const zeilenHtml = u.zeilen.map(z => {
+    const r = ROUTE.find(x => x.id === z.id);
+    const name = r ? r.name.split(' · ')[0] : z.id;
+    const stand = z.kosten === 0 ? '<s>wartet</s>'
+      : !z.aktuell ? '<s>heute nicht besucht</s>'
+      : z.rest === 0 ? '<s>fertig</s>'
+      : '<b>' + z.rest + '</b> offen';
+    return '<div class="pz"><b>' + esc(name) + '</b>' + stand + '</div>';
+  }).join('');
+
+  el.innerHTML =
+    '<p class="eyebrow">Der Termin</p>' +
+    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">' +
+      '<b style="font-family:var(--disp);font-size:34px;line-height:1">' + u.tage + '</b>' +
+      '<span class="muted">' + (u.tage === 1 ? 'Tag' : 'Tage') + ' bis zum Termin</span>' +
+      (fertig
+        ? '<span style="margin-left:auto;font-weight:700;color:var(--gruen,#2E7D32)">heute erledigt</span>'
+        : '<span style="margin-left:auto;font-weight:700">' + u.rest + ' offen</span>') +
+    '</div>' +
+    '<div style="margin:10px 0">' + zeilenHtml + '</div>' +
+    (route
+      ? '<a class="go' + (fertig ? ' fertig' : '') + '" href="' + route.file + '">' +
+        (fertig ? 'Noch einmal · ' : 'Weiter → ') + esc(route.name.split(' · ')[0]) + '</a>'
+      : '');
+}
+
 function render() {
   applyStatic();
   const packs = DATA.packs;
+  paintPlan(packs);
   document.getElementById('motto').textContent = MOTTOS[today() % MOTTOS.length][LANG === 'en' ? 1 : 0];
   paintHeader(DATA.profile);
   paintResume(packs);
@@ -1368,6 +1436,7 @@ function render() {
   paintTagwerk(DATA.profile);
   paintHofSec(DATA.profile);
   paintBadges(DATA.profile.badges);
+  if (window.Pruefung) Pruefung.saison(DATA.profile);   // same wheel as the Pakete
   if (window.Season) Season.apply(DATA.profile.answers || 0, { announce: false });
   const modeTxt = { account: t('storeAccount'), device: t('storeDevice'), memory: t('storeMemory') };
   document.getElementById('storeMode').textContent = modeTxt[STORE_MODE] || modeTxt.device;
